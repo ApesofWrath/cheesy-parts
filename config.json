@@ -1,12 +1,13 @@
 {
   "global": {
     "db_host": "localhost",
-    "db_user": "team254",
+    "db_user": "cheesy_parts_user",
     "db_database": "cheesy_parts",
     "port": 9000,
-    "base_address": "https://parts.team254.com",
-    "gmail_user": "cheesyparts@gmail.com",
-    "enable_wordpress_auth": true
+    "base_address": "https://parts.apesofwrath668.org",
+    "gmail_user": "parts@apesofwrath668.org",
+    "enable_wordpress_auth": false,
+    "enable_google_oauth" : false
     },
   "dev": {
     "db_password": "correcthorsebatterystaple",

@@ -11,6 +11,8 @@ require "json"
 require "pathological"
 require "pony"
 require "sinatra/base"
+require "google/apis/plus_v1"
+require "google/api_clent/client_secrets"
 
 require "models"
 
@@ -73,6 +75,18 @@ module CheesyParts
           redirect @redirect
         end
       end
+=begin
+      if CheesyCommon::Config.enable_google_oauth
+        client_secrets = Google::APIClient::ClientSecrets.load
+        auth_client = client_secrets.to_authorization
+        auth_client.update!(
+          :scope => ['https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
+          :redirect_uri => 'http://localhost:9000',
+        )
+        auth_uri = auth_client.authorization_uri.to_s
+        redirect auth_uri
+      end
+=end
 
       if params[:failed] == "1"
         @alert = "Invalid e-mail address or password."
