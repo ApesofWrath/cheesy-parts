@@ -4,10 +4,11 @@
     "db_user": "cheesy_parts_user",
     "db_database": "cheesy_parts",
     "port": 9000,
-    "base_address": "https://parts.apesofwrath668.org",
+    "base_address": "http://parts.apesofwrath668.org",
     "gmail_user": "parts@apesofwrath668.org",
     "enable_wordpress_auth": false,
-    "enable_google_oauth" : true
+    "enable_google_oauth" : true,
+    "slack_api_token": "xoxb-264940389040-b0MDcKQ9tXcazO0LUBnA3SRz"
     },
   "dev": {
     "db_password": "correcthorsebatterystaple",

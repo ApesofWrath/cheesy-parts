@@ -13,6 +13,7 @@ require "pony"
 require "sinatra/base"
 require "google/apis/oauth2_v2"
 require "google/api_client/client_secrets"
+require "slack-ruby-client"
 
 require "models"
 
@@ -24,6 +25,11 @@ module CheesyParts
     before do
       @user = User[session[:user_id]]
       authenticate! unless ["/login", "/register"].include?(request.path)
+      Slack.configure do |config|
+	 config.token = CheesyCommon::Config.slack_api_token
+      end
+      $slack_client = Slack::Web::Client.new
+      $slack_client.auth_test
     end
 
     def authenticate!
@@ -97,6 +103,7 @@ module CheesyParts
             end
           end
           session[:user_id] = user.id
+	  
           redirect @redirect
         elsif params[:error]
           @alert = "Error!"
@@ -523,6 +530,11 @@ module CheesyParts
       OrderItem.create(:project => @project, :order_id => order_id, :quantity => params[:quantity].to_i,
                        :part_number => params[:part_number], :description => params[:description],
                        :unit_cost => params[:unit_cost].to_f, :notes => params[:notes])
+      
+      $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => "orders", :text => "Item added to order list!",
+				     :as_user => true, :attachments => [{"fallback":"#{params[:quantity]} of #{params[:part_number]} added to #{params[:vendor]} order list",
+								       "color":"warning", "author_name":"#{params[:vendor]}", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{order_id}",
+								       "title":"Order Status", "text":"#{order.status}", "fields":[{"title":"Current cost", "value":"$#{order.total_cost}"}]}])
       redirect "/projects/#{@project.id}/orders/open"
     end
 
