@@ -12,11 +12,13 @@
   "dev": {
     "db_password": "correcthorsebatterystaple",
     "gmail_password": "correcthorsebatterystaple",
-    "members_url": "http://members.team254.dev:8081"
+    "members_url": "http://members.team254.dev:8081",
+    "ouath_callback_url": "http://localhost:9000/login"
   },
   "prod": {
-    "db_password": "Encrypted:0iYLP6HuJ7qY1/BtUYAQ+Q==\n",
+    "db_password": "Encrypted:QELTie+cal8Q9+NwvD017Q==\n",
     "gmail_password": "Encrypted:0iYLP6HuJ7qY1/BtUYAQ+Q==\n",
-    "members_url": "https://members.team254.com"
+    "members_url": "https://members.team254.com",
+    "oauth_callback_url": "http://parts.apesofwrath668.org/login"
   }
 }

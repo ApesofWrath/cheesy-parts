@@ -105,7 +105,7 @@ module CheesyParts
           $auth_client = client_secrets.to_authorization
           $auth_client.update!(
             :scope => ['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/plus.me','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
-            :redirect_uri => 'http://localhost:9000/login'
+            :redirect_uri => CheesyCommon::Config.oauth_callback_url
           )
           auth_uri = $auth_client.authorization_uri.to_s
           redirect auth_uri
