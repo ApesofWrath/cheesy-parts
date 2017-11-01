@@ -11,8 +11,8 @@ require "json"
 require "pathological"
 require "pony"
 require "sinatra/base"
-require "google/apis/plus_v1"
-require "google/api_clent/client_secrets"
+require "google/apis/oauth2_v2"
+require "google/api_client/client_secrets"
 
 require "models"
 
@@ -75,18 +75,42 @@ module CheesyParts
           redirect @redirect
         end
       end
-=begin
+
       if CheesyCommon::Config.enable_google_oauth
-        client_secrets = Google::APIClient::ClientSecrets.load
-        auth_client = client_secrets.to_authorization
-        auth_client.update!(
-          :scope => ['https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
-          :redirect_uri => 'http://localhost:9000',
-        )
-        auth_uri = auth_client.authorization_uri.to_s
-        redirect auth_uri
+        if params[:code]
+          $auth_client.code = request['code']
+          $auth_client.fetch_access_token!
+          oauth_service = Google::Apis::Oauth2V2::Oauth2Service.new
+          oauth_service.authorization = $auth_client
+          profile = oauth_service.get_userinfo(:fields => 'email,id,name')
+          unless profile.email.include? "@apesofwrath668.org"
+            redirect "/"
+          end 
+          if profile.nil?
+            @alert = "No person!"
+          else
+            user = User[:wordpress_user_id => profile.id[0,7]]
+            unless user
+              user = User.create(:wordpress_user_id => profile.id[0,7], :first_name => profile.name.split(" ")[0],
+                                 :last_name => profile.name.split(" ")[1], :permission => "editor", :enabled => 1,
+                                 :email => profile.email, :password => "", :salt => "")
+            end
+          end
+          session[:user_id] = user.id
+          redirect @redirect
+        elsif params[:error]
+          @alert = "Error!"
+        else
+          client_secrets = Google::APIClient::ClientSecrets.load
+          $auth_client = client_secrets.to_authorization
+          $auth_client.update!(
+            :scope => ['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/plus.me','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
+            :redirect_uri => 'http://localhost:9000/login'
+          )
+          auth_uri = $auth_client.authorization_uri.to_s
+          redirect auth_uri
+        end
       end
-=end
 
       if params[:failed] == "1"
         @alert = "Invalid e-mail address or password."

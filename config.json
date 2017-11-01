@@ -7,7 +7,7 @@
     "base_address": "https://parts.apesofwrath668.org",
     "gmail_user": "parts@apesofwrath668.org",
     "enable_wordpress_auth": false,
-    "enable_google_oauth" : false
+    "enable_google_oauth" : true
     },
   "dev": {
     "db_password": "correcthorsebatterystaple",
