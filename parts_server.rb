@@ -25,11 +25,13 @@ module CheesyParts
     before do
       @user = User[session[:user_id]]
       authenticate! unless ["/login", "/register"].include?(request.path)
-      Slack.configure do |config|
-	 config.token = CheesyCommon::Config.slack_api_token
+      if CheesyCommon::Config.enable_slack_integrations
+        Slack.configure do |config|
+  	       config.token = CheesyCommon::Config.slack_api_token
+        end
+        $slack_client = Slack::Web::Client.new
+        $slack_client.auth_test
       end
-      $slack_client = Slack::Web::Client.new
-      $slack_client.auth_test
     end
 
     def authenticate!
@@ -89,9 +91,9 @@ module CheesyParts
           oauth_service = Google::Apis::Oauth2V2::Oauth2Service.new
           oauth_service.authorization = $auth_client
           profile = oauth_service.get_userinfo(:fields => 'email,id,name')
-          unless profile.email.include? "@apesofwrath668.org"
+          unless profile.email.include? CheesyCommon::Config.user_domain_whitelist
             redirect "/"
-          end 
+          end
           if profile.nil?
             @alert = "No person!"
           else
@@ -103,7 +105,7 @@ module CheesyParts
             end
           end
           session[:user_id] = user.id
-	  
+
           redirect @redirect
         elsif params[:error]
           @alert = "Error!"
@@ -261,6 +263,8 @@ module CheesyParts
       part.cut_length = ""
       part.priority = 1
       part.drawing_created = 0
+      part.cnc_part = 0
+      part.link = ""
       part.save
       redirect "/parts/#{part.id}"
     end
@@ -303,6 +307,8 @@ module CheesyParts
       @part.quantity = params[:quantity] if params[:quantity]
       @part.drawing_created = (params[:drawing_created] == "on") ? 1 : 0
       @part.priority = params[:priority] if params[:priority]
+      @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
+      @part.link = params[:link] if params[:link]
       @part.save
       redirect params[:referrer] || "/parts/#{params[:id]}"
     end
@@ -530,11 +536,14 @@ module CheesyParts
       OrderItem.create(:project => @project, :order_id => order_id, :quantity => params[:quantity].to_i,
                        :part_number => params[:part_number], :description => params[:description],
                        :unit_cost => params[:unit_cost].to_f, :notes => params[:notes])
-      
-      $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => "orders", :text => "Item added to order list!",
-				     :as_user => true, :attachments => [{"fallback":"#{params[:quantity]} of #{params[:part_number]} added to #{params[:vendor]} order list",
-								       "color":"warning", "author_name":"#{params[:vendor]}", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{order_id}",
-								       "title":"Order Status", "text":"#{order.status}", "fields":[{"title":"Current cost", "value":"$#{order.total_cost}"}]}])
+      if CheesyCommon::Config.enable_slack_integrations
+        $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Item added to order list!",
+  				     :as_user => true, :attachments => [{"fallback":"#{params[:quantity]} of #{params[:part_number]} added to #{params[:vendor]} order list",
+  								       "color":"danger", "author_name":"#{params[:vendor]} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{order_id}",
+  								       "title":"Item Ordered", "text":"#{params[:description]} (PN: #{params[:part_number]})",
+                         "fields":[{"title":"Quantity", "value":"#{params[:quantity]}", "short":true},
+                                   {"title":"Unit cost", "value":"$#{params[:unit_cost]}", "short":true}]}])
+      end
       redirect "/projects/#{@project.id}/orders/open"
     end
 
@@ -600,10 +609,35 @@ module CheesyParts
 
       @order = Order[params[:order_id]]
       halt(400, "Invalid order.") if @order.nil?
+
+      old_order_status = @order.status
+      new_order_status = params[:status]
+
       @order.update(:status => params[:status], :ordered_at => params[:ordered_at],
                     :paid_for_by => params[:paid_for_by], :tax_cost => params[:tax_cost].gsub(/\$/, ""),
                     :shipping_cost => params[:shipping_cost].gsub(/\$/, ""), :notes => params[:notes],
                     :reimbursed => params[:reimbursed] ? 1 : 0)
+
+      if CheesyCommon::Config.enable_slack_integrations
+        unless old_order_status == new_order_status
+          if params[:status].include?"ordered"
+            $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Order placed!",
+      				     :as_user => true, :attachments => [{"fallback":"Order from #{@order.vendor_name} has been placed",
+      								       "color":"warning", "author_name":"#{@order.vendor_name} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{@order.id}",
+      								       "title":"#{@order.vendor_name} order has been placed", "text":"Order placed by #{params[:paid_for_by]} at #{params[:ordered_at]}",
+                             "fields":[{"title":"Total cost", "value":"$#{@order.total_cost}", "short":true},
+                                       {"title":"Order status", "value":"#{params[:status]}", "short":true}]}])
+          elsif params[:status].include?"received"
+            $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Order received!",
+      				     :as_user => true, :attachments => [{"fallback":"Order from #{@order.vendor_name} has been received",
+      								       "color":"good", "author_name":"#{@order.vendor_name} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{@order.id}",
+      								       "title":"#{@order.vendor_name} order has been received", "text":"Order placed by #{params[:paid_for_by]} at #{params[:ordered_at]}",
+                             "fields":[{"title":"Total cost", "value":"$#{@order.total_cost}", "short":true},
+                                       {"title":"Order status", "value":"#{params[:status]}", "short":true}]}])
+          end
+        end
+      end
+
       redirect "/projects/#{@project.id}/orders/#{@order.id}"
     end
 
