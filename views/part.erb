@@ -46,7 +46,7 @@
     <tr><td><b>Quantity required</b></td><td><%= @part.quantity %></td></tr>
     <tr><td><b>CNC Part?</b></td><td><%= (@part.cnc_part == 1) ? "Yes" : "No" %></td></tr>
     <tr><td><b>Drawing/G-code Created?</b></td><td><%= (@part.drawing_created == 1) ? "Yes" : "No" %></td></tr>
-    <tr><td><b>Drawing/G-code Link</b></td><td><%= @part.link %></td></tr>
+    <tr><td><b>Drawing/G-code Link</b></td><td><%= (@part.drawing_created == 1) ? "<a href= \"#{@part.link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td></tr>
     <tr><td><b>Priority</b></td><td><%= Part::PRIORITY_MAP[@part.priority] %></td></tr>
   </table>
   <% if @user.can_edit? %>

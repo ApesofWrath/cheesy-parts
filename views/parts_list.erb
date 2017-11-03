@@ -5,6 +5,7 @@
     <th><a href="?sort=name">Name</a></th>
     <th><a href="?sort=parent_part_id">Parent</th>
     <th><a href="?sort=status">Status</th>
+    <th><a href="?sort=link">Link</th>
     <% if @user.can_edit? %>
       <th>Action</th>
     <% end %>
@@ -20,6 +21,7 @@
         <% end %>
       </td>
       <td><span class="label label-status-<%= part.status %>"><%= Part::STATUS_MAP[part.status] %></span></td>
+      <td><%= (part.drawing_created == 1) ? "<a href= \"#{part.link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td>
       <% if @user.can_edit? %>
         <td>
           <a href="/parts/<%= part.id %>/edit" class="btn btn-primary btn-small">

@@ -295,9 +295,15 @@ module CheesyParts
       @part = Part[params[:id]]
       halt(400, "Invalid part.") if @part.nil?
       halt(400, "Missing part name.") if params[:name] && params[:name].empty?
+      halt(400, "No drawing link provided.") if params[:drawing_created] && params[:link].empty?
+      halt(400, "Must provide drawing link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:link].empty?)
+      halt(400, "Must provide source material to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:source_material].empty?)
+      halt(400, "Must provide quantity to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:quantity].empty?)
       @part.name = params[:name].gsub("\"", "&quot;") if params[:name]
       if params[:status]
         halt(400, "Invalid status.") unless Part::STATUS_MAP.include?(params[:status])
+        old_part_status = @part.status
+        new_part_status = params[:status]
         @part.status = params[:status]
       end
       @part.notes = params[:notes] if params[:notes]
@@ -310,6 +316,22 @@ module CheesyParts
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
       @part.link = params[:link] if params[:link]
       @part.save
+
+      if CheesyCommon::Config.enable_slack_integrations
+        if (new_part_status != old_part_status) && (new_part_status.include?"ready")
+          $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_parts_room, :text => "New part ready for manufacturing!",
+                 :as_user => true, :attachments => [{"fallback":"Part ready to manufacturing",
+                           "color":"good", "author_name":"Part ready to manufacture", "author_link":"#{CheesyCommon::Config.base_address}/parts/#{@part.id}",
+                           "title":"Part name", "text":"#{@part.name}",
+                           "fields":[{"title":"Material", "value":"#{@part.source_material}", "short":true},
+                                     {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
+                                     {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
+                                     {"title":"CNC Part?", "value":"#{@part.cnc_part ? "Yes" : "No"}", "short":true},
+                                     {"title":"Drawing Link", "value":"#{@part.link}", "short":true},
+                                     {"title":"Notes", "value":"#{@part.notes}", "short":false}]}])
+        end
+      end
+
       redirect params[:referrer] || "/parts/#{params[:id]}"
     end
 
