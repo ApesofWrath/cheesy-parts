@@ -86,3 +86,8 @@ label {
 .table th a {
   color: black;
 }
+
+li > h4 {
+  display: inline-block;
+}
+
