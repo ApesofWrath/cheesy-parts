@@ -5,4 +5,4 @@ Sequel.migration do
       add_column :cnc_part, Integer, :null => false
     end
   end
-endF
+end
