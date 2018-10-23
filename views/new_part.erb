@@ -4,11 +4,14 @@
   <h2>Create New <%= @type.capitalize %></h2>
   <form action="/parts" method="POST">
     <input type=hidden name=type value="<%= @type %>" />
+    
     <label>Project</label>
     <input type="text" disabled value="<%= @project.name %>" />
     <input type="hidden" name="project_id" value="<%= @project.id %>" />
+    
     <label><%= @type.capitalize %> Name</label>
     <input type="text" name="name" />
+    
     <label>Parent Assembly</label>
     <select name="parent_part_id">
       <% @project.parts.select { |p| p.type == "assembly"}.each do |part| %>
@@ -17,6 +20,19 @@
       </option>
       <% end %>
     </select>
+
+    <label>Assignee</label>
+    <select name="assignee">
+      <option value="None" selected>
+        N/A
+      </option>
+      <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
+      <option value="<%= user.first_name %> <%= user.last_name %>">
+        <%= user.first_name %> <%= user.last_name %>
+      </option>
+      <% end %>
+    </select>
+    
     <label>
       <input type="submit" class="btn btn-success btn-medium" value="Create <%= @type.capitalize %>">
     </label>
