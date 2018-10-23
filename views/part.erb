@@ -49,8 +49,10 @@
     <% end %>
     <tr><td><b>Quantity required</b></td><td><%= @part.quantity %></td></tr>
     <tr><td><b>CNC Part?</b></td><td><%= (@part.cnc_part == 1) ? "Yes" : "No" %></td></tr>
-    <tr><td><b>Drawing/G-code Created?</b></td><td><%= (@part.drawing_created == 1) ? "Yes" : "No" %></td></tr>
-    <tr><td><b>Drawing/G-code Link</b></td><td><%= (@part.drawing_created == 1) ? "<a href= \"#{@part.link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td></tr>
+    <tr><td><b>Drawing Created?</b></td><td><%= (@part.drawing_created == 1) ? "Yes" : "No" %></td></tr>
+    <tr><td><b>G-code Created?</b></td><td><%= (@part.gcode_created == 1) ? "Yes" : "No" %></td></tr>
+    <tr><td><b>Drawing Link</b></td><td><%= (@part.drawing_created == 1) ? "<a href= \"#{@part.drawing_link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td></tr>
+    <tr><td><b>G-code Link</b></td><td><%= (@part.gcode_created == 1) ? "<a href= \"#{@part.gcode_link}\"><img src=\"/img/onshapeicon128.png\" width=\"16\" height=\"16\">" : "" %></td></tr>
     <tr><td><b>Priority</b></td><td><%= Part::PRIORITY_MAP[@part.priority] %></td></tr>
   </table>
   <% if @user.can_edit? %>
