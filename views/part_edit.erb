@@ -24,7 +24,7 @@
         N/A
       </option>
       <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
-      <option value="<%= user.first_name %> <%= user.last_name %>" <% if @part. == key %> selected<% end %>>
+      <option value="<%= user.first_name %> <%= user.last_name %>" <% if @part.assignee == key %> selected<% end %>>
         <%= user.first_name %> <%= user.last_name %>
       </option>
       <% end %>
