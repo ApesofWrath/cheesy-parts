@@ -273,6 +273,7 @@ module CheesyParts
       part.drawing_created = 0
       part.cnc_part = 0
       part.link = ""
+      part.assignee = params[:assignee].gsub("\"", "&quot;")
       part.save
       redirect "/parts/#{part.id}"
     end
@@ -316,10 +317,10 @@ module CheesyParts
       end
       @part.notes = params[:notes] if params[:notes]
       @part.source_material = params[:source_material] if params[:source_material]
-      @part.have_material = (params[:have_material] == "on") ? 1 : 0
+      @part.have_material = (params[:have_material] == "on") ? 1 : 0 if params[:have_material]
       @part.cut_length = params[:cut_length] if params[:cut_length]
       @part.quantity = params[:quantity] if params[:quantity]
-      @part.drawing_created = (params[:drawing_created] == "on") ? 1 : 0
+      @part.drawing_created = (params[:drawing_created] == "on") ? 1 : 0 if params[:drawing_created]
       @part.priority = params[:priority] if params[:priority]
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
       @part.link = params[:link] if params[:link]
@@ -340,7 +341,7 @@ module CheesyParts
         end
       end
 
-      redirect params[:referrer] || "/parts/#{params[:id]}"
+      redirect params[:referrer] || "/parts/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
     end
 
     get "/parts/:id/delete" do
