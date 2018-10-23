@@ -146,6 +146,10 @@ module CheesyParts
       end
     end
 
+
+
+
+    # Projects
     get "/new_project" do
       require_permission(@user.can_administer?)
       erb :new_project
@@ -162,7 +166,7 @@ module CheesyParts
       halt(400, "Missing project name.") if params[:name].nil?
       halt(400, "Missing part number prefix.") if params[:part_number_prefix].nil?
 
-      project = Project.create(:name => params[:name], :part_number_prefix => params[:part_number_prefix])
+      project = Project.create(:name => params[:name], :part_number_prefix => params[:part_number_prefix], :hide_dashboards => false)
       redirect "/projects/#{project.id}"
     end
 
@@ -228,10 +232,14 @@ module CheesyParts
       erb :new_part
     end
 
+
+    # Dashboards
     get "/dashboards" do
       erb :dashboards
     end
 
+
+    # Parts
     post "/parts" do
       require_permission(@user.can_edit?)
 
@@ -356,6 +364,15 @@ module CheesyParts
       redirect params[:referrer] || "/projects/#{project_id}"
     end
 
+
+
+    # Planning
+    get "/planning" do
+      erb :planning
+    end
+
+
+    # Users
     get "/new_user" do
       require_permission(@user.can_administer?)
       @admin_new_user = true
@@ -484,6 +501,10 @@ module CheesyParts
       erb :register_confirmation
     end
 
+
+
+
+    # Orders
     get "/orders" do
       erb :orders_project_list
     end
