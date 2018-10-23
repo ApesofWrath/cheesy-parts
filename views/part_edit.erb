@@ -7,6 +7,7 @@
     <label><span class="label label-info">Part Number</span> <%= @part.full_part_number %></label>
     <label>Part Name</label>
     <input type="text" name="name" value="<%= @part.name %>" />
+    
     <label>Status</label>
     <select name="status">
       <% Part::STATUS_MAP.each_pair do |key, value| %>
@@ -15,6 +16,21 @@
         </option>
       <% end %>
     </select>
+
+    <!-- Change assignee.
+       - TODO: need to have currect assignee selected (look how it is done for status above). -->
+    <label>Assignee</label>
+    <select name="assignee_id">
+      <option value="None" selected>
+        N/A
+      </option>
+      <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
+      <option value="<%= user.first_name %> <%= user.last_name %>" <% if @part. == key %> selected<% end %>>
+        <%= user.first_name %> <%= user.last_name %>
+      </option>
+      <% end %>
+    </select>
+
     <label>Notes</label>
      <textarea name="notes" rows="4"><%= @part.notes %></textarea>
     <label>Source Material</label>
@@ -33,7 +49,7 @@
       <input type="checkbox" name="drawing_created"<% if @part.drawing_created == 1 %>checked<% end %>/>
     </label>
     <label>Drawing/G-code Link</label>
-    <input type="text" name="link" value="<%= @part.link %>" />
+      <input type="text" name="link" value="<%= @part.link %>" />
     <label>Priority</label>
     <select name="priority">
       <% Part::PRIORITY_MAP.each_pair do |key, value| %>
