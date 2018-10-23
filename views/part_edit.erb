@@ -44,11 +44,16 @@
     <label>CNC Part?</b>
       <input type="checkbox" name="cnc_part"<% if @part.cnc_part == 1 %>checked<% end %>/>
     </label>
-    <label>Drawing/G-code Created?</b>
+    <label>Drawing Created?</b>
       <input type="checkbox" name="drawing_created"<% if @part.drawing_created == 1 %>checked<% end %>/>
     </label>
-    <label>Drawing/G-code Link</label>
-      <input type="text" name="link" value="<%= @part.link %>" />
+    <label>G-code Created?</b>
+      <input type="checkbox" name="gcode_created"<% if @part.gcode_created == 1 %>checked<% end %>/>
+    </label>   
+    <label>Drawing Link</label>
+      <input type="text" name="drawing_link" value="<%= @part.drawing_link %>" />
+    <label>G-code Link</label>
+      <input type="text" name="gcode_link" value="<%= @part.gcode_link %>" />
     <label>Priority</label>
     <select name="priority">
       <% Part::PRIORITY_MAP.each_pair do |key, value| %>
