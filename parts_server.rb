@@ -324,6 +324,7 @@ module CheesyParts
       @part.priority = params[:priority] if params[:priority]
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
       @part.link = params[:link] if params[:link]
+      @part.assignee = params[:assignee] if params[:assignee]
       @part.save
 
       if CheesyCommon::Config.enable_slack_integrations
