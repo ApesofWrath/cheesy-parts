@@ -271,8 +271,10 @@ module CheesyParts
       part.cut_length = ""
       part.priority = 1
       part.drawing_created = 0
+      part.gcode_created = 0
       part.cnc_part = 0
-      part.link = ""
+      part.drawing_link = ""
+      part.gcode_link = ""
       part.assignee = params[:assignee].gsub("\"", "&quot;")
       part.save
       redirect "/parts/#{part.id}"
@@ -304,8 +306,10 @@ module CheesyParts
       @part = Part[params[:id]]
       halt(400, "Invalid part.") if @part.nil?
       halt(400, "Missing part name.") if params[:name] && params[:name].empty?
-      halt(400, "No drawing link provided.") if params[:drawing_created] && params[:link].empty?
-      halt(400, "Must provide drawing link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:link].empty?)
+      halt(400, "No drawing link provided.") if params[:drawing_created] && params[:drawing_link].empty?
+      halt(400, "Must provide drawing link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:drawing_link].empty?)
+      halt(400, "No gcode link provided.") if params[:gcode_created] && params[:gcode_link].empty?
+      halt(400, "Must provide gcode link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:gcode_link].empty?)
       halt(400, "Must provide source material to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:source_material].empty?)
       halt(400, "Must provide quantity to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:quantity].empty?)
       @part.name = params[:name].gsub("\"", "&quot;") if params[:name]
@@ -321,9 +325,11 @@ module CheesyParts
       @part.cut_length = params[:cut_length] if params[:cut_length]
       @part.quantity = params[:quantity] if params[:quantity]
       @part.drawing_created = (params[:drawing_created] == "on") ? 1 : 0 if params[:drawing_created]
+      @part.gcode_created = (params[:gcode_created] == "on") ? 1 : 0 if params[:gcode_created]
       @part.priority = params[:priority] if params[:priority]
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
-      @part.link = params[:link] if params[:link]
+      @part.drawing_link = params[:drawing_link] if params[:drawing_link]
+      @part.gcode_link = params[:gcode_link] if params[:gcode_link]
       @part.assignee = params[:assignee] if params[:assignee]
       @part.save
 
@@ -337,7 +343,8 @@ module CheesyParts
                                      {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
                                      {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
                                      {"title":"CNC Part?", "value":"#{@part.cnc_part ? "Yes" : "No"}", "short":true},
-                                     {"title":"Drawing Link", "value":"#{@part.link}", "short":true},
+                                     {"title":"Drawing Link", "value":"#{@part.drawing_link}", "short":true},
+                                     {"title":"Gcode Link", "value":"#{@part.gcode_link}", "short":true},
                                      {"title":"Notes", "value":"#{@part.notes}", "short":false}]}])
         end
       end
