@@ -587,14 +587,14 @@ module CheesyParts
 
       OrderItem.create(:project => @project, :order_id => order_id, :quantity => params[:quantity].to_i,
                        :part_number => params[:part_number], :description => params[:description],
-                       :unit_cost => params[:unit_cost].to_f, :notes => params[:notes])
+                       :unit_cost => params[:unit_cost][0] == '$' ? params[:unit_cost][1..-1].to_f : params[:unit_cost].to_f, :notes => params[:notes])
       if CheesyCommon::Config.enable_slack_integrations
         $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Item added to order list!",
   				     :as_user => true, :attachments => [{"fallback":"#{params[:quantity]} of #{params[:part_number]} added to #{params[:vendor]} order list",
   								       "color":"danger", "author_name":"#{params[:vendor]} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{order_id}",
   								       "title":"Item Ordered", "text":"#{params[:description]} (PN: #{params[:part_number]})",
                          "fields":[{"title":"Quantity", "value":"#{params[:quantity]}", "short":true},
-                                   {"title":"Unit cost", "value":"$#{params[:unit_cost]}", "short":true}]}])
+                                   {"title":"Unit cost", "value":"#{params[:unit_cost]}[0] == '$' ? #{params[:unit_cost]} : '$' + #{params[:unit_cost]}", "short":true}]}])
       end
       redirect "/projects/#{@project.id}/orders/open"
     end
