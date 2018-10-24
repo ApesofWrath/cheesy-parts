@@ -49,6 +49,7 @@
     <% end %>
     <tr><td><b>Quantity required</b></td><td><%= @part.quantity %></td></tr>
     <tr><td><b>CNC Part?</b></td><td><%= (@part.cnc_part == 1) ? "Yes" : "No" %></td></tr>
+    <tr><td><b>3D Print Part?</b></td><td><%= (@part.3d_part == 1) ? "Yes" : "No" %></td></tr>
     <tr><td><b>Drawing Created?</b></td><td><%= (@part.drawing_created == 1) ? "Yes" : "No" %></td></tr>
     <tr><td><b>G-code Created?</b></td><td><%= (@part.gcode_created == 1) ? "Yes" : "No" %></td></tr>
     <tr><td><b>Drawing Link</b></td><td><%= (@part.drawing_created == 1) ? "<a href= \"#{@part.drawing_link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td></tr>
