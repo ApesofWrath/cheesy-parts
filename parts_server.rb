@@ -273,6 +273,7 @@ module CheesyParts
       part.drawing_created = 0
       part.gcode_created = 0
       part.cnc_part = 0
+      part.3d_part = 0
       part.drawing_link = ""
       part.gcode_link = ""
       part.assignee = params[:assignee].gsub("\"", "&quot;")
@@ -328,6 +329,7 @@ module CheesyParts
       @part.gcode_created = (params[:gcode_created] == "on") ? 1 : 0 if params[:gcode_created]
       @part.priority = params[:priority] if params[:priority]
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
+      @part.3d_part = (params[:3d_part] == "on") ? 1 : 0
       @part.drawing_link = params[:drawing_link] if params[:drawing_link]
       @part.gcode_link = params[:gcode_link] if params[:gcode_link]
       @part.assignee = params[:assignee] if params[:assignee]
@@ -343,6 +345,7 @@ module CheesyParts
                                      {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
                                      {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
                                      {"title":"CNC Part?", "value":"#{@part.cnc_part ? "Yes" : "No"}", "short":true},
+                                     {"title":"3D Print Part?", "value":"#{@part.3d_part ? "Yes" : "No"}", "short":true},
                                      {"title":"Drawing Link", "value":"#{@part.drawing_link}", "short":true},
                                      {"title":"Gcode Link", "value":"#{@part.gcode_link}", "short":true},
                                      {"title":"Notes", "value":"#{@part.notes}", "short":false}]}])
