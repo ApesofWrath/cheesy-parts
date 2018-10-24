@@ -43,7 +43,10 @@
       </td>
 
       <!-- Link to drawing -->
-      <td><%= (part.drawing_created == 1) ? "<a href= \"#{part.link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td>
+      <td><%= (part.drawing_created == 1) ? "<a href= \"#{part.drawing_link}\"><img src=\"/img/driveicon128.png\" width=\"16\" height=\"16\">" : "" %></td>
+
+      <!-- Link to gcode -->
+      <td><%= (part.gcode_created == 1) ? "<a href= \"#{part.gcode_link}\"><img src=\"/img/onshapeicon128.png\" width=\"16\" height=\"16\">" : "" %></td>
 
       <!-- Show assignee -->
       <td><%= part.assignee %></td>     
