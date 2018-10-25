@@ -146,9 +146,6 @@ module CheesyParts
       end
     end
 
-
-
-
     # Projects
     get "/new_project" do
       require_permission(@user.can_administer?)
@@ -376,13 +373,65 @@ module CheesyParts
       redirect params[:referrer] || "/projects/#{project_id}"
     end
 
-
-
     # Planning
     get "/planning" do
       erb :planning
     end
 
+    # Mechanical
+    get "/mechanical" do
+      erb :mechanical
+    end
+
+    # Machining
+    get "/machining" do
+      erb :machining
+    end
+
+    # CAD
+    get "/cad" do
+      erb :cad
+    end
+
+    # Electrical
+    get "/electrical" do
+      erb :electrical
+    end
+
+    # Programming
+    get "/programming" do
+      erb :programming
+    end
+
+    # Additive Manufacturing
+    get "/additiveman" do
+      erb :additiveman
+    end
+
+    # Media
+    get "/media" do
+      erb :media
+    end
+
+    # Business
+    get "/business" do
+      erb :business
+    end
+
+    # Outreach
+    get "/outreach" do
+      erb :outreach
+    end
+
+    # Scouting
+    get "/scouting" do
+      erb :scouting
+    end
+
+    # Leadership
+    get "/leadership" do
+      erb :leadership
+    end
 
     # Users
     get "/new_user" do
@@ -512,9 +561,6 @@ module CheesyParts
       send_email(CheesyCommon::Config.gmail_user, "Approval needed for #{user.email}", email_body)
       erb :register_confirmation
     end
-
-
-
 
     # Orders
     get "/orders" do
