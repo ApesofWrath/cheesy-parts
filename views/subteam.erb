@@ -1,0 +1,42 @@
+<%= erb :header %>
+
+<div class="container">
+  <div class="row">
+    <div class="span2">
+        <b><h3><% if @subteam.name == "AdditiveMan" %>
+                        Additive&nbsp;Manufacturing
+                    <% else %> 
+                        <%= @subteam.name %> 
+                    <% end %>
+            </h3>&nbsp;All&nbsp;Tasks</b>
+    </div>
+    <form action="/subteams/<%= @subteam.name %>/new_task" method="POST">
+    <input type="hidden" value="<%= @subteam.name %>" name="subteam" />
+    <% if @user.can_administer? %>
+        <div class="pull-right" style="margin-top: 20px;">
+            <label><input type="submit" class="btn btn-success btn-small" value="New Task"></label>
+      </div>
+    <% end %>
+    </form>
+    </div>
+
+    <table class="table table-striped table-condensed table-bordered">
+    <tr>
+        <th>Name</th>
+        <th>Project</th>
+        <th><a href="?sort=deadline">Deadline</a></th>
+    </tr>
+    <% Task.order(:deadline).each do |task| %>
+        <tr>
+            <% if task.sub_name == @subteam.name %>
+                <td><%= task.name %></td>
+                <td><%= Project[task.project_id].name %></td>
+                <td><%= task.deadline %></td>
+            <% end %>
+        </tr>
+    <% end %>
+  </div>
+</div>
+
+<%= erb :footer %>
+

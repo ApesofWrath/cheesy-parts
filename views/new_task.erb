@@ -1,0 +1,27 @@
+<%= erb :header %>
+
+<div class="container">
+  <h2>Create New Task</h2>
+  <form action="/subteams/<%= params[:subteam] %>" method="POST">
+    <label>Task Name</label>
+    <input type="text" name="name" />
+
+    <!-- Change assignee -->
+    <label>Parent Project</label>
+    <select name="project_id">
+        <% Project.order(:id).each do |project| %>
+      <option value="<%= project.id %>" >
+        <%= project.name %>
+      </option>
+      <% end %>
+    </select>
+
+    <label>Subteam</label>
+    <input type="text" name="subteam" readonly value="<%= params[:subteam] %>" />
+    <label>Deadline</label>
+    <input type="text" <% unless @user.can_edit? %>disabled <% end %>class="datepicker" data-date-format="yyyy-mm-dd" name="deadline" value="<%= @task.deadline.strftime("%F") rescue "" %>"/>
+    <label><input type="submit" class="btn btn-success btn-medium" value="Create Task"></label>
+  </form>
+</div>
+
+<%= erb :footer %>
