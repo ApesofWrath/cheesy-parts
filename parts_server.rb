@@ -167,6 +167,7 @@ module CheesyParts
       redirect "/projects/#{project.id}"
     end
 
+    # Check that it is a valid project id
     before "/projects/:id*" do
       @project = Project[params[:id]]
       halt(400, "Invalid project.") if @project.nil?
@@ -183,7 +184,6 @@ module CheesyParts
 
     get "/projects/:id/edit" do
       require_permission(@user.can_administer?)
-
       erb :project_edit
     end
 
@@ -373,64 +373,39 @@ module CheesyParts
       redirect params[:referrer] || "/projects/#{project_id}"
     end
 
-    # Planning
-    get "/planning" do
-      erb :planning
+    # Subteam pages
+    # Check that it is a valid subteam   
+    before "/subteams/:name*" do
+      @subteam = Subteam[params[:name]]
+      halt(400, "Invalid subteam \"#{params[:name]}\"") if @subteam.nil?
     end
 
-    # Mechanical
-    get "/mechanical" do
-      erb :mechanical
+    # Subteam page (with tasks)
+    get "/subteams/:subteam" do
+      erb :subteam
+    end    
+    
+    # Create new task
+    get "/subteams/:sub_name/new_task" do
+      require_permission(@user.can_administer?)
+      erb :new_task
     end
 
-    # Machining
-    get "/machining" do
-      erb :machining
+    # Send subteam name to new task page
+    post "/subteams/:sub_name/new_task" do
+      require_permission(@user.can_administer?)
+      erb :new_task
     end
 
-    # CAD
-    get "/cad" do
-      erb :cad
-    end
+    # Back to sub page after creating task
+    post "/subteams/:subteam" do
+      require_permission(@user.can_administer?)
 
-    # Electrical
-    get "/electrical" do
-      erb :electrical
-    end
+      halt(400, "Missing task name.") if params[:name].nil?
+      halt(400, "Missing deadline.") if params[:deadline].nil?
 
-    # Programming
-    get "/programming" do
-      erb :programming
-    end
-
-    # Additive Manufacturing
-    get "/additiveman" do
-      erb :additiveman
-    end
-
-    # Media
-    get "/media" do
-      erb :media
-    end
-
-    # Business
-    get "/business" do
-      erb :business
-    end
-
-    # Outreach
-    get "/outreach" do
-      erb :outreach
-    end
-
-    # Scouting
-    get "/scouting" do
-      erb :scouting
-    end
-
-    # Leadership
-    get "/leadership" do
-      erb :leadership
+      task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam])
+      redirect "/subteams/#{task.sub_name}"
     end
 
     # Users
