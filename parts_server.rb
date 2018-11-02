@@ -174,7 +174,7 @@ module CheesyParts
     end
 
     get "/projects/:id" do
-      if ["type", "name", "parent_part_id", "status"].include?(params[:sort])
+      if ["type", "name", "parent_part_id", "status", "assignee"].include?(params[:sort])
         @part_sort = params[:sort].to_sym
       else
         @part_sort = :id
@@ -404,7 +404,7 @@ module CheesyParts
       halt(400, "Missing task name.") if params[:name].nil?
       halt(400, "Missing deadline.") if params[:deadline].nil?
 
-      task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam])
+      task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam], :notes => params[:notes])
       redirect "/subteams/#{task.sub_name}"
     end
 
