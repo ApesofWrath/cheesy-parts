@@ -12,11 +12,6 @@
     </div>
     <form action="/subteams/<%= @subteam.name %>/new_task" method="POST">
     <input type="hidden" value="<%= @subteam.name %>" name="subteam" />
-    <% if @user.can_administer? %>
-        <div class="pull-right" style="margin-top: 20px;">
-            <label><input type="submit" class="btn btn-success btn-small" value="New Task"></label>
-      </div>
-    <% end %>
     </form>
     </div>
 
@@ -25,18 +20,86 @@
         <th>Name</th>
         <th>Project</th>
         <th><a href="?sort=deadline">Deadline</a></th>
+        <th>Status</th>
+        <th style="width: 50%;">Notes</th>
+        <th>Action</th>
     </tr>
     <% Task.order(:deadline).each do |task| %>
-        <tr>
-            <% if task.sub_name == @subteam.name %>
-                <td><%= task.name %></td>
-                <td><%= Project[task.project_id].name %></td>
+        <% if task.sub_name == @subteam.name %>
+            <tr>
+                <td><a href="/tasks/<%= task.id %>"><%= task.name %></a></td>
+                <td><a href="/projects/<%= task.project_id %>"><%= Project[task.project_id].name %></a></td>
                 <td><%= task.deadline %></td>
+                <td>
+                  <% if @user.can_edit? %>
+                    <span class="label label-status-<%= task.status %> label-<%= task.id %>" onclick="$('.label-<%= task.id %>').hide();$('.change-status-<%= task.id %>-div').show()"><%= Task::STATUS[task.status] %></span>
+                    <div class="change-status-<%= task.id %>-div" style="display: none">
+                    <select name="status" class="select-status-<%= task.id %> selectpicker" style="margin-bottom: 0;">
+                      <% Task::STATUS.each_pair do |key, value| %>
+                      <option data-content="<span class='label label-status-<%= key %>'><%= value %></span>" value="<%= key %>"<% if task.status == key %> selected<% end %>>
+                        <%= value %>               
+                      </option>
+                    <% end %>
+                    </select>
+                    <a onclick="editTask(<%= task.id %>, '<%= task.name %>')" class="btn btn-success btn-small" style="margin-bottom: 12px;">
+                      <i class="icon-white icon-check"></i>
+                    </a>
+                    </div>
+                    <% else %>
+                      <span class="label label-status-<%= task.status %>"><%= Task::STATUS[task.status] %></span>
+                    <% end %>
+                </td>
+                <td><%= task.notes %></td>
+                
+                <!-- Edit or delete -->
+                <% if @user.can_edit? %>
+                  <td>
+                      <a href="/tasks/<%= task.id %>/edit" class="btn btn-primary btn-small">
+                      <i class="icon-white icon-pencil"></i>
+                    </a>
+                    <a href="/tasks/<%= task.id %>/delete" class="btn btn-danger btn-small">
+                      <i class="icon-white icon-trash"></i>
+                    </a>
+                  </td>
+              <% end %>
+            </tr>
             <% end %>
-        </tr>
     <% end %>
   </div>
 </div>
+
+<script>
+  var status_map = <%= Task::STATUS.to_json %>;
+  function editTask(id, name) {
+    var status_key = $(".select-status-" + id).val();
+    var url = `/tasks/${id}/edit`;
+    $.ajax({
+      url: url,
+      type: 'POST',
+      data: {
+        "id": id,
+        "name": name,
+        "status": status_key,
+        "redirect": false
+      },
+      success: function (result, status, xhr) {
+        var classNames = $('.label-' + id).attr("class").toString().split(' ');
+        for (var i = 0; i < classNames.length; i++) {
+          if (classNames[i].startsWith('label-status')) {
+            $('.label-' + id).removeClass(classNames[i]);
+            $('.label-' + id).addClass('label-status-' + status_key);
+          }
+        };
+        $('.label-' + id).html(status_map[status_key]);
+        $('.change-status-' + id + '-div').hide();
+        $('.label-' + id).show();
+      },
+      error: function (xhr, status, error) {
+        console.error(error);
+      }
+    });
+  }
+</script>
 
 <%= erb :footer %>
 
