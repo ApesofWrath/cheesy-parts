@@ -30,6 +30,16 @@
       <% end %>
     </select>
 
+    <!-- Milestone -->
+    <label>Milestone</label>
+    <select name="milestone_name">
+        <% Milestone.where(:project_id => @part.project_id).each do |milestone| %>
+      <option value="<%= milestone.name %>" <% if @part.milestone_name == milestone.name %> selected<% end %>>
+        <%= milestone.name %>
+      </option>
+      <% end %>
+    </select>
+
     <label>Notes</label>
      <textarea name="notes" rows="4"><%= @part.notes %></textarea>
     <label>Source Material</label>

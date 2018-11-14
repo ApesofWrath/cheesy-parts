@@ -41,6 +41,10 @@
       <td><b>Assignee</b></td>
       <td><%= @part.assignee %></td>
     </tr>
+    <tr>
+      <td><b>Milestone</b></td>
+      <td><%= @part.milestone_name %></td>
+    </tr>
     <tr><td><b>Notes</b></td><td><%= (@part.notes || "").gsub("\n", "<br />") %></td></tr>
     <% if @part.type == "part" %>
       <tr><td><b>Source material</b></td><td><%= @part.source_material %></td></tr>

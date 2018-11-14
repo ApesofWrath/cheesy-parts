@@ -21,11 +21,17 @@
       <% end %>
     </select>
 
+    <label>Milestone</label>
+    <select name="milestone_name">
+      <% Milestone.where(:project_id => @project.id).each do |milestone| %>
+      <option value="<%= milestone.name %>">
+        <%= milestone.name %>
+      </option>
+      <% end %>
+    </select>
+
     <label>Assignee</label>
     <select name="assignee">
-      <option value="None" selected>
-        N/A
-      </option>
       <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
       <option value="<%= user.first_name %> <%= user.last_name %>">
         <%= user.first_name %> <%= user.last_name %>
