@@ -100,7 +100,7 @@ module CheesyParts
             user = User[:wordpress_user_id => profile.id[0,7]]
             unless user
               user = User.create(:wordpress_user_id => profile.id[0,7], :first_name => profile.name.split(" ")[0],
-                                 :last_name => profile.name.split(" ")[1], :permission => "editor", :enabled => 1,
+                                 :last_name => profile.name.split(" ")[1], :permission => "read-only", :enabled => 1,
                                  :email => profile.email, :password => "", :salt => "")
             end
           end
@@ -229,12 +229,165 @@ module CheesyParts
       erb :new_part
     end
 
+    # New Milestone
+    get "/projects/:id/new_milestone" do
+      require_permission(@user.can_edit?)
+
+      erb :new_milestone
+    end
+    
+    # Created Milestone
+    post "/milestones" do
+      require_permission(@user.can_edit?)
+
+      # Check parameter existence and format.
+      halt(400, "Missing milestone name.") if params[:name].nil? || params[:name].empty?
+      if params[:project_id] && params[:project_id] !~ /^\d+$/
+        halt(400, "Invalid project ID.")
+      end
+
+      project = Project[params[:project_id].to_i]
+      halt(400, "Invalid project.") if project.nil?
+      halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
+      halt(400, "Missing start date.") if params[:start_date].nil? || params[:start_date].empty?
+      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date  
+
+      begin
+        milestone = Milestone.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :start_date => params[:start_date], :notes => params[:notes], :status => "in_progress") 
+        milestone.save
+      rescue Sequel::UniqueConstraintViolation
+        halt(400, "Milestone already exists.")
+      end
+
+      redirect "/milestones/#{milestone.id}"
+    end     
+
+    # Milestone
+    get "/milestones/:id" do
+      @milestone = Milestone[params[:id]]
+      halt(400, "Invalid milestone.") if @milestone.nil?
+      erb :milestone
+    end
+
+    # New Task
+    get "/projects/:id/new_task" do
+      require_permission(@user.can_edit?)
+      erb :new_task
+    end
+
+    # Create Task
+    post "/tasks" do
+      require_permission(@user.can_edit?)
+
+      # Check parameter existence and format.
+      halt(400, "Missing task name.") if params[:name].nil? || params[:name].empty?
+      project = Project[params[:project_id].to_i]
+      halt(400, "Invalid project.") if project.nil?
+      subteam = Subteam[params[:subteam]]
+      halt(400, "Invalid subteam.") if subteam.nil?
+      halt(400, "Invalid milestone.") if params[:milestone_name].nil? || params[:milestone_name].empty?
+      halt(400, "Missing assignee.") if params[:assignee].nil? || params[:assignee].empty?
+      halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
+      halt(400, "Missing start date.") if params[:start_date].nil? || params[:start_date].empty?  
+      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
+
+      begin
+        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_name => params[:milestone_name], :sub_name => params[:subteam], :notes => params[:notes], :status => "in_progress", :start_date => params[:start_date]) 
+        task.save
+      rescue Sequel::UniqueConstraintViolation
+        halt(400, "Task already exists.")
+      end
+
+      redirect "/tasks/#{task.id}"
+    end     
+
+    # Task
+    get "/tasks/:id" do
+      @task = Task[params[:id]]
+      halt(400, "Invalid task.") if @task.nil?
+      erb :task
+    end
+
+    get "/tasks/:id/edit" do
+      require_permission(@user.can_edit?)
+
+      @task = Task[params[:id]]
+      halt(400, "Invalid task.") if @task.nil?
+      @referrer = request.referrer
+      erb :task_edit
+    end
+
+    post "/tasks/:id/edit" do
+      require_permission(@user.can_edit?)
+
+      @task = Task[params[:id]]
+      # Check parameter existence and format.
+      halt(400, "Missing task name.") if params[:name].nil? || params[:name].empty?
+      #project = Project[params[:project_id].to_i]
+      #halt(400, "Invalid project.") if project.nil?
+      #subteam = Subteam[params[:subteam]]
+      #halt(400, "Invalid subteam.") if subteam.nil?
+      #halt(400, "Invalid milestone.") if params[:milestone_name].nil? || params[:milestone_name].empty?
+      #halt(400, "Missing assignee.") if params[:assignee].nil? || params[:assignee].empty?
+      #halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
+      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
+
+      @task.name = params[:name].gsub("\"", "&quot;") if params[:name]
+      if params[:status]
+        halt(400, "Invalid status.") unless Task::STATUS.include?(params[:status])
+        old_task_status = @task.status
+        new_task_status = params[:status]
+        @task.status = params[:status]
+      end
+      @task.assignee = params[:assignee] if params[:assignee]
+      @task.sub_name = params[:subteam] if params[:subteam]
+      @task.milestone_name = params[:milestone_name] if params[:milestone_name]
+      @task.start_date = params[:start_date] if params[:start_date]
+      @task.deadline = params[:deadline] if params[:deadline]
+      @task.notes = params[:notes] if params[:notes]
+      @task.save
+      redirect params[:referrer] || "/tasks/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
+    end   
+
+    get "/tasks/:id/delete" do
+      require_permission(@user.can_edit?)
+
+      @task = Task[params[:id]]
+      halt(400, "Invalid task.") if @task.nil?
+      @referrer = request.referrer
+      erb :task_delete
+    end
+
+    post "/tasks/:id/delete" do
+      require_permission(@user.can_edit?)
+
+      @task = Task[params[:id]]
+      project_id = @task.project_id
+      halt(400, "Invalid task.") if @task.nil?
+      @task.delete
+      params[:referrer] = nil if params[:referrer] =~ /\/tasks\/#{params[:id]}$/
+      redirect params[:referrer] || "/projects/#{project_id}"
+    end
+
+    # Planning
+    get "/planning" do
+      erb :planning
+    end
+    
+    # Check that it is a valid project id
+    before "/planning/:id*" do
+      @project = Project[params[:id]]
+      halt(400, "Invalid project.") if @project.nil?
+    end
+
+    get "/planning/:id" do
+      erb :gannt
+    end
 
     # Dashboards
     get "/dashboards" do
       erb :dashboards
     end
-
 
     # Parts
     post "/parts" do
@@ -274,6 +427,7 @@ module CheesyParts
       part.drawing_link = ""
       part.gcode_link = ""
       part.assignee = params[:assignee].gsub("\"", "&quot;")
+      part.milestone_name = params[:milestone_name];
       part.save
       redirect "/parts/#{part.id}"
     end
@@ -310,6 +464,7 @@ module CheesyParts
       halt(400, "Must provide gcode link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:gcode_link].empty?)
       halt(400, "Must provide source material to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:source_material].empty?)
       halt(400, "Must provide quantity to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:quantity].empty?)
+      halt(400, "Must provide a milestone.") if params[:milestone_name].nil? || params[:milestone_name] == ""
       @part.name = params[:name].gsub("\"", "&quot;") if params[:name]
       if params[:status]
         halt(400, "Invalid status.") unless Part::STATUS_MAP.include?(params[:status])
@@ -317,13 +472,14 @@ module CheesyParts
         new_part_status = params[:status]
         @part.status = params[:status]
       end
+      @part.milestone_name = params[:milestone_name] if params[:milestone_name]
       @part.notes = params[:notes] if params[:notes]
       @part.source_material = params[:source_material] if params[:source_material]
       @part.have_material = (params[:have_material] == "on") ? 1 : 0 if params[:have_material]
       @part.cut_length = params[:cut_length] if params[:cut_length]
       @part.quantity = params[:quantity] if params[:quantity]
-      @part.drawing_created = (params[:drawing_created] == "on") ? 1 : 0 if params[:drawing_created]
-      @part.gcode_created = (params[:gcode_created] == "on") ? 1 : 0 if params[:gcode_created]
+      @part.drawing_created = (params[:drawing_created] == "on" || params[:drawing_link].strip.length > 0) ? 1 : 0
+      @part.gcode_created = (params[:gcode_created] == "on" || params[:gcode_created].strip.length > 0) ? 1 : 0 if params[:gcode_created]
       @part.priority = params[:priority] if params[:priority]
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
       @part.print_part = (params[:print_part] == "on") ? 1 : 0
@@ -384,18 +540,6 @@ module CheesyParts
     get "/subteams/:subteam" do
       erb :subteam
     end    
-    
-    # Create new task
-    get "/subteams/:sub_name/new_task" do
-      require_permission(@user.can_administer?)
-      erb :new_task
-    end
-
-    # Send subteam name to new task page
-    post "/subteams/:sub_name/new_task" do
-      require_permission(@user.can_administer?)
-      erb :new_task
-    end
 
     # Back to sub page after creating task
     post "/subteams/:subteam" do
@@ -404,7 +548,7 @@ module CheesyParts
       halt(400, "Missing task name.") if params[:name].nil?
       halt(400, "Missing deadline.") if params[:deadline].nil?
 
-      task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam], :notes => params[:notes])
+      task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam], :notes => params[:notes], :milestone_name => "")
       redirect "/subteams/#{task.sub_name}"
     end
 
