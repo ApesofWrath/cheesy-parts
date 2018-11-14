@@ -6,4 +6,5 @@
 class Project < Sequel::Model
   one_to_many :parts
   one_to_many :orders
+  one_to_many :tasks
 end
