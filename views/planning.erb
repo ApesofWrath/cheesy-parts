@@ -3,8 +3,13 @@
 <div class="container">
   <div class="row">
     <div class="span2">
-      <h2>Project&nbsp;Planning</h2>
+      <h2>Gannt&nbsp;Charts</h2>
     </div>
+  </div>
+  <div class="well">
+  <% Project.each do |project| %>
+    <li><h4><a href="/planning/<%= project.id %>"><%= project.name %></a></h4></li>
+  <% end %>
   </div>
 </div>
 
