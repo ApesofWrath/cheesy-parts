@@ -1,0 +1,28 @@
+<%= erb :header %>
+
+<div class="container">
+  <h2>Create New Milestone</h2>
+  <form action="/milestones" method="POST">
+    <label>Project</label>
+    <input type="text" disabled value="<%= @project.name %>" />
+    <input type="hidden" name="project_id" value="<%= @project.id %>" />
+    
+    <label>Name</label>
+    <input type="text" name="name" />
+
+    <label>Start Date</label>
+    <input type="text" class="datepicker" data-date-format="yyyy-mm-dd" name="start_date"/>   
+
+    <label>Deadline</label>
+    <input type="text" class="datepicker" data-date-format="yyyy-mm-dd" name="deadline"/>
+
+    <label>Notes</label>
+    <textarea name="notes" rows="4"></textarea>
+    
+    <label>
+      <input type="submit" class="btn btn-success btn-medium" value="Create Milestone">
+    </label>
+  </form>
+</div>
+
+<%= erb :footer %>

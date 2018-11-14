@@ -1,0 +1,99 @@
+<%= erb :header %>
+
+<div class="container">
+  <div class="row">
+    <div class="span2">
+      <h2><%= @project.name.gsub(" ", "&nbsp;") %></h2>
+    </div>
+  </div>
+
+  <!-- Gannt Chart -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    google.charts.load('current', {'packages':['gantt']});
+    google.charts.setOnLoadCallback(drawChart);
+
+    function daysToMilliseconds(days) {
+      return days * 24 * 60 * 60 * 1000;
+    }
+
+    function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Task ID');
+      data.addColumn('string', 'Task Name');
+      data.addColumn('date', 'Start Date');
+      data.addColumn('date', 'End Date');
+      data.addColumn('number', 'Duration');
+      data.addColumn('number', 'Percent Complete');
+      data.addColumn('string', 'Dependencies');
+
+      var numRows = 0;
+        data.addRows([
+            <% Milestone.each do |milestone| 
+              if milestone.project_id == @project.id %>
+                ['<%= milestone.name %>', '<%= milestone.name %>', new Date(Date.parse("<%= milestone.start_date %>".replace('-','/','g'))), 
+                    new Date(Date.parse("<%= milestone.deadline %>".replace('-','/','g'))), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
+
+                  <% Task.each do |task| 
+                    if task.project_id == @project.id && task.milestone_name == milestone.name %>
+                      ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(Date.parse("<%= task.start_date %>".replace('-','/','g'))), 
+                        new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone_name %>'],
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+      ]);
+
+      <% Milestone.each do |milestone| %>
+        numRows++;
+      <% end %>      
+      <% Task.each do |task| %>
+        numRows++;
+      <% end %>
+      var options = {
+          height: 45 * numRows,
+
+          gantt: {
+            criticalPathEnabled: false, // Critical path arrows will be the same as other arrows.
+
+            palette: [
+              {
+                "color": "#4f92ff",
+                "dark": "#005a9c",
+                "light": "#99beff"
+              }
+            ],
+
+            innerGridHorizLine: {
+              stroke: '#ffffff',
+              strokeWidth: 1
+            },
+            innerGridTrack: {fill: '#efefef'},
+            innerGridDarkTrack: {fill: '#c1c1c19'},
+
+            arrow: {
+              angle: 45,
+              color: '#474747',
+              radius: 3
+            }
+          }
+      };
+
+      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+    }
+  </script>
+  <style>
+    #chart_div {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      border-radius: .5rem;
+    }
+  </style>
+  <div id="chart_div"></div>
+</div>
+
+<%= erb :footer %>

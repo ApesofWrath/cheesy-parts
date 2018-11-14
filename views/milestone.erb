@@ -1,0 +1,27 @@
+<%= erb :header %>
+
+<div class="container">
+  <h2>Milestone: <%= @milestone.name %></h2>
+  <br>
+  <table class="table table-striped table-condensed table-bordered" style="width: auto;">
+    <tr>
+      <td><b>Project</b></td>
+      <td><a href="/projects/<%= @milestone.project_id %>"><b><%= @milestone.project.name %></a></td>
+    </tr>
+    <tr><td><b>Start Date</b></td><td><%= @milestone.start_date %></td></tr>
+    <tr><td><b>Deadline</b></td><td><%= @milestone.deadline %></td></tr>
+    <tr><td><b>Notes</b></td><td><%= (@milestone.notes || "").gsub("\n", "<br>") %></td></tr>
+  </table>
+  <% if @user.can_edit? %>
+    <div class="pull-right" style="margin-top: -40px;">
+      <a href="/milestones/<%= @milestone.id %>/edit" class="btn btn-primary btn-small">
+        <i class="icon-white icon-pencil"></i> Edit this milestone
+      </a>
+      <a href="/milestones/<%= @milestone.id %>/delete" class="btn btn-danger btn-small">
+        <i class="icon-white icon-trash"></i> Delete this milestone
+      </a>
+    </div>
+  <% end %>
+</div>
+
+<%= erb :footer %>
