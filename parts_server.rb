@@ -330,7 +330,7 @@ module CheesyParts
       #halt(400, "Invalid milestone.") if params[:milestone_name].nil? || params[:milestone_name].empty?
       #halt(400, "Missing assignee.") if params[:assignee].nil? || params[:assignee].empty?
       #halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
-      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
+      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date if params[:start_date]
 
       @task.name = params[:name].gsub("\"", "&quot;") if params[:name]
       if params[:status]
@@ -478,7 +478,7 @@ module CheesyParts
       @part.have_material = (params[:have_material] == "on") ? 1 : 0 if params[:have_material]
       @part.cut_length = params[:cut_length] if params[:cut_length]
       @part.quantity = params[:quantity] if params[:quantity]
-      @part.drawing_created = (params[:drawing_created] == "on" || params[:drawing_link].strip.length > 0) ? 1 : 0
+      @part.drawing_created = (params[:drawing_created] == "on" || params[:drawing_link].strip.length > 0) ? 1 : 0 if params[:drawing_created]
       @part.gcode_created = (params[:gcode_created] == "on" || params[:gcode_created].strip.length > 0) ? 1 : 0 if params[:gcode_created]
       @part.priority = params[:priority] if params[:priority]
       @part.cnc_part = (params[:cnc_part] == "on") ? 1 : 0
