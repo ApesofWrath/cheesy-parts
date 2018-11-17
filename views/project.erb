@@ -9,9 +9,11 @@
       <a href="/projects/<%= @project.id %>/new_part?type=assembly" class="btn btn-success btn-small">
         <i class="icon-white icon-th"></i> New Assembly
       </a>
-      <a href="/projects/<%= @project.id %>/new_task" class="btn btn-success btn-small">
-        <i class="icon-white icon-list-alt"></i> New Task
-      </a>     
+      <% if @user.can_administer? %>
+        <a href="/projects/<%= @project.id %>/new_task" class="btn btn-success btn-small">
+          <i class="icon-white icon-list-alt"></i> New Task
+        </a>
+      <% end %>
       <a href="/projects/<%= @project.id %>/new_milestone" class="btn btn-success btn-small">
         <i class="icon-white icon-road"></i> New Milestone
       </a>
