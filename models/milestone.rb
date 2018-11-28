@@ -4,7 +4,7 @@
 # Represents a single part or assembly in a project.
 
 class Milestone < Sequel::Model
-  one_to_many :project
+  many_to_one :project
   one_to_many :task
   one_to_many :part
 
