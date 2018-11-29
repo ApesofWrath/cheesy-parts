@@ -4,7 +4,7 @@ Sequel.migration do
       primary_key :id
       String :name, :null => false, :unique => true
       Integer :project_id, :null => false
-      String :subteam, :null => false
+      String :sub_name, :null => false
       Date :deadline, :null => false
       String :milestone_id, :null => false
       String :assignee, :null => false
