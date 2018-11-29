@@ -36,9 +36,9 @@
                     new Date(Date.parse("<%= milestone.deadline %>".replace('-','/','g'))), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
 
                   <% Task.each do |task| 
-                    if task.project_id == @project.id && task.milestone_name == milestone.name %>
+                    if task.project_id == @project.id && task.milestone_id == milestone.id %>
                       ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(Date.parse("<%= task.start_date %>".replace('-','/','g'))), 
-                        new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone_name %>'],
+                        new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.name %>'],
                   <% end %>
                 <% end %>
               <% end %>

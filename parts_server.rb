@@ -269,6 +269,63 @@ module CheesyParts
       erb :milestone
     end
 
+    get "/milestones/:id/delete" do
+      require_permission(@user.can_edit?)
+
+      @milestone = Milestone[params[:id]]
+      halt(400, "Invalid milestone.") if @milestone.nil?
+      @referrer = request.referrer
+      erb :milestone_delete
+    end
+
+    post "/milestones/:id/delete" do
+      require_permission(@user.can_edit?)
+
+      @milestone = Milestone[params[:id]]
+      project_id = @milestone.project_id
+  #    id = @milestone.id
+      halt(400, "Invalid task.") if @milestone.nil?
+      @milestone.delete
+
+ #     Part.where(id => @part.milestone_id).each do |part|
+#        part.milestone_id = 0
+
+
+      params[:referrer] = nil if params[:referrer] =~ /\/milestones\/#{params[:id]}$/
+      redirect params[:referrer] || "/projects/#{project_id}"
+    end
+
+    get "/milestones/:id/edit" do
+      require_permission(@user.can_edit?)
+
+      @milestone = Milestone[params[:id]]
+      halt(400, "Invalid milestone.") if @milestone.nil?
+      @referrer = request.referrer
+      erb :milestone_edit
+    end
+
+    post "/milestones/:id/edit" do
+      require_permission(@user.can_edit?)
+
+      @milestone = Milestone[params[:id]]
+      # Check parameter existence and format.
+      halt(400, "Missing milestone name.") if params[:name].nil? || params[:name].empty?
+      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date if params[:start_date]
+
+      @milestone.name = params[:name].gsub("\"", "&quot;") if params[:name]
+      if params[:status]
+        halt(400, "Invalid status.") unless Milestone::STATUS_MAP.include?(params[:status])
+        old_task_status = @milestone.status
+        new_task_status = params[:status]
+        @milestone.status = params[:status]
+      end
+      @milestone.start_date = params[:start_date] if params[:start_date]
+      @milestone.deadline = params[:deadline] if params[:deadline]
+      @milestone.notes = params[:notes] if params[:notes]
+      @milestone.save
+      redirect params[:referrer] || "/milestones/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
+    end
+
     # New Task
     get "/projects/:id/new_task" do
       require_permission(@user.can_edit?)
@@ -341,7 +398,7 @@ module CheesyParts
       end
       @task.assignee = params[:assignee] if params[:assignee]
       @task.sub_name = params[:subteam] if params[:subteam]
-      @task.milestone_name = params[:milestone_name] if params[:milestone_name]
+      @task.milestone_id = params[:milestone_id] if params[:milestone_id]
       @task.start_date = params[:start_date] if params[:start_date]
       @task.deadline = params[:deadline] if params[:deadline]
       @task.notes = params[:notes] if params[:notes]
@@ -427,7 +484,7 @@ module CheesyParts
       part.drawing_link = ""
       part.gcode_link = ""
       part.assignee = params[:assignee].gsub("\"", "&quot;")
-      part.milestone_name = params[:milestone_name];
+      part.milestone_id = params[:milestone_id];
       part.save
       redirect "/parts/#{part.id}"
     end
@@ -464,7 +521,7 @@ module CheesyParts
       halt(400, "Must provide gcode link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:gcode_link].empty?)
       halt(400, "Must provide source material to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:source_material].empty?)
       halt(400, "Must provide quantity to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:quantity].empty?)
-      halt(400, "Must provide a milestone.") if params[:milestone_name].nil? || params[:milestone_name] == ""
+      halt(400, "Must provide a milestone.") if params[:milestone_id].nil? || params[:milestone_id] == ""
       @part.name = params[:name].gsub("\"", "&quot;") if params[:name]
       if params[:status]
         halt(400, "Invalid status.") unless Part::STATUS_MAP.include?(params[:status])
@@ -472,7 +529,7 @@ module CheesyParts
         new_part_status = params[:status]
         @part.status = params[:status]
       end
-      @part.milestone_name = params[:milestone_name] if params[:milestone_name]
+      @part.milestone_id = params[:milestone_id] if params[:milestone_id]
       @part.notes = params[:notes] if params[:notes]
       @part.source_material = params[:source_material] if params[:source_material]
       @part.have_material = (params[:have_material] == "on") ? 1 : 0 if params[:have_material]

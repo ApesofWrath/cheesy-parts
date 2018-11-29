@@ -34,7 +34,7 @@
     <label>Milestone</label>
     <select name="milestone_name">
         <% Milestone.where(:project_id => @part.project_id).each do |milestone| %>
-      <option value="<%= milestone.name %>" <% if @part.milestone_name == milestone.name %> selected<% end %>>
+      <option value="<%= milestone.name %>" <% if @part.milestone_id == milestone.id %> selected<% end %>>
         <%= milestone.name %>
       </option>
       <% end %>

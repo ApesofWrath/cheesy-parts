@@ -1,0 +1,32 @@
+<%= erb :header %>
+
+<div class="container">
+  <h2>Edit Milestone</h2>
+  <form action="" method="POST">
+    <input type="hidden" name="referrer" value="<%= @referrer %>" />
+    <label>Milestone Name</label>
+    <input type="text" name="name" value="<%= @milestone.name %>" />
+    
+    <label>Status</label>
+    <select name="status">
+      <% Milestone::STATUS_MAP.each_pair do |key, value| %>
+        <option value="<%= key %>"<% if @milestone.status == key %> selected<% end %>>
+          <%= value %>
+        </option>
+      <% end %>
+    </select>
+    
+    <label>Start Date</label>
+    <input type="text" <% unless @user.can_edit? %>disabled <% end %>class="datepicker" data-date-format="yyyy-mm-dd" name="start_date" value="<%= @milestone.start_date.strftime("%F") rescue "" %>"/>
+
+    <label>Deadline</label>
+    <input type="text" <% unless @user.can_edit? %>disabled <% end %>class="datepicker" data-date-format="yyyy-mm-dd" name="deadline" value="<%= @milestone.deadline.strftime("%F") rescue "" %>"/>
+
+    <label>Notes</label>
+    <textarea name="notes" rows="4"><%= @milestone.notes %></textarea>
+
+    <label><input type="submit" class="btn btn-primary btn-medium" value="Save Part" /></label>
+  </form>
+</div>
+
+<%= erb :footer %>

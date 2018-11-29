@@ -22,9 +22,9 @@
     </select>
 
     <label>Milestone</label>
-    <select name="milestone_name">
+    <select name="milestone_id">
       <% Milestone.where(:project_id => @project.id).each do |milestone| %>
-      <option value="<%= milestone.name %>">
+      <option value="<%= milestone.id %>">
         <%= milestone.name %>
       </option>
       <% end %>

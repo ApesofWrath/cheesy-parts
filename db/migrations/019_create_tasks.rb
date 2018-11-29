@@ -6,7 +6,7 @@ Sequel.migration do
       Integer :project_id, :null => false
       String :subteam, :null => false
       Date :deadline, :null => false
-      String :milestone_name, :null => false
+      String :milestone_id, :null => false
       String :assignee, :null => false
       String :status, :null => false
     end

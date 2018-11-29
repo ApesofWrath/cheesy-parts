@@ -8,6 +8,12 @@
       <td><b>Project</b></td>
       <td><a href="/projects/<%= @milestone.project_id %>"><b><%= @milestone.project.name %></b></a></td>
     </tr>
+    <tr>
+      <td><b>Status</b></td>
+      <td>
+        <span class="label label-status-<%= @milestone.status %>"><%= Milestone::STATUS_MAP[@milestone.status] %></span>
+      </td>
+    </tr>
     <tr><td><b>Start Date</b></td><td><%= @milestone.start_date %></td></tr>
     <tr><td><b>Deadline</b></td><td><%= @milestone.deadline %></td></tr>
     <tr><td><b>Notes</b></td><td><%= (@milestone.notes || "").gsub("\n", "<br>") %></td></tr>

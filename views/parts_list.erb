@@ -34,7 +34,7 @@
               </option>
             <% end %>
           </select>
-          <a onclick="editPart(<%= part.id %>, '<%= part.name %>', '<%= part.milestone_name %>')" class="btn btn-success btn-small" style="margin-bottom: 12px;">
+          <a onclick="editPart(<%= part.id %>, '<%= part.name %>', '<%= part.milestone_id %>')" class="btn btn-success btn-small" style="margin-bottom: 12px;">
             <i class="icon-white icon-check"></i>
           </a>
         </div>
@@ -69,7 +69,7 @@
 
 <script>
   var status_map = <%= Part::STATUS_MAP.to_json %>;
-  function editPart(id, name, milestone_name) {
+  function editPart(id, name, milestone_id) {
     var status_key = $(".select-status-" + id).val();
     var url = `${location.origin}/parts/${id}/edit`;
     $.ajax({
@@ -79,7 +79,7 @@
         "id": id,
         "name": name,
         "status": status_key,
-        "milestone_name": milestone_name, 
+        "milestone_id": milestone_id, 
         "redirect": false
       },
       success: function (result, status, xhr) {
