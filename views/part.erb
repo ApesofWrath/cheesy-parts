@@ -44,7 +44,7 @@
     <tr>
       <td><b>Milestone</b></td>
       <td>
-          <% if @part.milestone_id == 0 %>
+          <% if @part.milestone.nil? || @part.milestone_id == 0 %>
             None 
           <% else %>
             <a href="/milestones/<%= @part.milestone_id %>"><%= @part.milestone.name %></a> 
