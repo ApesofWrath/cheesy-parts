@@ -342,14 +342,14 @@ module CheesyParts
       halt(400, "Invalid project.") if project.nil?
       subteam = Subteam[params[:subteam]]
       halt(400, "Invalid subteam.") if subteam.nil?
-      halt(400, "Invalid milestone.") if params[:milestone_name].nil? || params[:milestone_name].empty?
+      halt(400, "Invalid milestone.") if params[:milestone_id].nil? || params[:milestone_id].empty?
       halt(400, "Missing assignee.") if params[:assignee].nil? || params[:assignee].empty?
       halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
       halt(400, "Missing start date.") if params[:start_date].nil? || params[:start_date].empty?  
       halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
 
       begin
-        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_name => params[:milestone_name], :sub_name => params[:subteam], :notes => params[:notes], :status => "in_progress", :start_date => params[:start_date]) 
+        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :status => "in_progress", :start_date => params[:start_date]) 
         task.save
       rescue Sequel::UniqueConstraintViolation
         halt(400, "Task already exists.")
@@ -521,7 +521,7 @@ module CheesyParts
       halt(400, "Must provide gcode link to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:gcode_link].empty?)
       halt(400, "Must provide source material to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:source_material].empty?)
       halt(400, "Must provide quantity to mark as ready to manufacture.") if (params[:status]) && (params[:status].include?("ready")) && (params[:quantity].empty?)
-      halt(400, "Must provide a milestone.") if params[:milestone_id].nil? || params[:milestone_id] == ""
+      halt(400, "Must provide a milestone.") if params[:milestone_id].nil? || params[:milestone_id].empty?
       @part.name = params[:name].gsub("\"", "&quot;") if params[:name]
       if params[:status]
         halt(400, "Invalid status.") unless Part::STATUS_MAP.include?(params[:status])
