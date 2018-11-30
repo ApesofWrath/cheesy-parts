@@ -856,7 +856,7 @@ module CheesyParts
 
       @item.update(:order_id => order_id, :quantity => params[:quantity].to_i,
                    :part_number => params[:part_number], :description => params[:description],
-                   :unit_cost => params[:unit_cost].gsub(/\$/, "").to_f, :requested_by => params[:requested_by], :notes => params[:notes])
+                   :unit_cost => params[:unit_cost].gsub(/\$/, ""), :requested_by => params[:requested_by], :notes => params[:notes])
       redirect params[:referrer]
     end
 
