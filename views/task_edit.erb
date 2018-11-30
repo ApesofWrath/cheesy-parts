@@ -26,7 +26,7 @@
     <label>Assignee</label>
     <select name="assignee">
       <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
-      <option value="<%= user.first_name %> <%= user.last_name %>">
+      <option value="<%= user.first_name %> <%= user.last_name %>" <% if @task.assignee == (user.first_name + " " + user.last_name) %> selected<% end %>>    
         <%= user.first_name %> <%= user.last_name %>
       </option>
       <% end %>
