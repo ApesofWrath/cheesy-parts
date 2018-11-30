@@ -19,7 +19,16 @@
       <td><%= @task.assignee %></td>
     <tr>
       <td><b>Subteam</b></td>
-      <td><a href="/subteams/<%= @task.sub_name %>"><b><%= @task.sub_name %></b></a></td>
+      <td><a href="/subteams/<%= @task.sub_name %>"><%= @task.sub_name %></a></td>
+    </tr>
+    <tr><td><b>Milestone</b></td>
+      <td>
+          <% if @task.milestone.nil? || @task.milestone_id == 0 %>
+            None 
+          <% else %>
+            <a href="/milestones/<%= @task.milestone_id %>"><%= @task.milestone.name %></a> 
+          <% end %>
+      </td>
     </tr>
     <tr><td><b>Deadline</b></td><td><%= @task.deadline %></td></tr>
     <tr><td><b>Notes</b></td><td><%= (@task.notes || "").gsub("\n", "<br>") %></td></tr>
