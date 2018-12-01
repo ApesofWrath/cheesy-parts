@@ -5,6 +5,7 @@
     <%= @order.vendor_name %>
     <%= @order.ordered_at.strftime("%F") rescue "" %>
   </h2>
+  <a href="/projects/<%= @project.id %>/orders/open">&larr;Back to open orders</a>
   <%= erb :order_items_list, :locals => { :order_items => @order.order_items, :order => nil } %>
   <form action="/projects/<%= @project.id %>/orders/<%= @order.id %>/edit" method="POST">
     <label>Status</label>
