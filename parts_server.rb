@@ -822,7 +822,7 @@ module CheesyParts
   								       "title":"Item Ordered", "text":"#{params[:description]} (PN: #{params[:part_number]})",
                                        "title":"Notes", "text":"#{params[:notes]} (requested by #{params[:requested_by]})",
                                        "fields":[{"title":"Quantity", "value":"#{params[:quantity]}", "short":true},
-                                                 {"title":"Unit cost", "value":"#{('$' + params[:unit_cost].gsub(/\$/, '')).to_f}", "short":true}]}])
+                                                 {"title":"Unit cost", "value":"#{('$' + ('%.2f' % (params[:unit_cost].gsub(/\$/, '').to_f).to_s))}", "short":true}]}])
       end
       redirect "/projects/#{@project.id}/orders/open"
     end
