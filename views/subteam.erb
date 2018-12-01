@@ -19,9 +19,10 @@
     <tr>
         <th>Name</th>
         <th>Project</th>
-        <th><a href="?sort=deadline">Deadline</a></th>
+        <th>Milestone</th>
+        <th>Deadline</th>
         <th>Status</th>
-        <th style="width: 50%;">Notes</th>
+        <th style="width: 40%;">Notes</th>
         <th>Action</th>
     </tr>
     <% Task.order(:deadline).each do |task| %>
@@ -29,6 +30,13 @@
             <tr>
                 <td><a href="/tasks/<%= task.id %>"><%= task.name %></a></td>
                 <td><a href="/projects/<%= task.project_id %>"><%= Project[task.project_id].name %></a></td>
+                <td>
+                  <% if task.milestone.nil? || task.milestone_id == 0 %>
+                    None 
+                  <% else %>
+                    <a href="/milestones/<%= task.milestone_id %>"><%= task.milestone.name %></a> 
+                  <% end %>
+                </td>
                 <td><%= task.deadline %></td>
                 <td>
                   <% if @user.can_edit? %>
