@@ -7,6 +7,8 @@
     </div>
   </div>
 
+  <p id="error"></p>
+
   <!-- Gannt Chart -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script type="text/javascript">
@@ -18,7 +20,6 @@
     }
 
     function drawChart() {
-
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Task ID');
       data.addColumn('string', 'Task Name');
@@ -28,31 +29,31 @@
       data.addColumn('number', 'Percent Complete');
       data.addColumn('string', 'Dependencies');
 
-      var numRows = 0;
+      var numMiles = <%= DB[:milestones].count %>
+      var numTasks = <%= DB[:tasks].count %>
+
+      <% if DB[:milestones].count != 0 %>
         data.addRows([
-            <% Milestone.each do |milestone| 
-              if milestone.project_id == @project.id %>
-                ['<%= milestone.name %>', '<%= milestone.name %>', new Date(Date.parse("<%= milestone.start_date %>".replace('-','/','g'))), 
-                    new Date(Date.parse("<%= milestone.deadline %>".replace('-','/','g'))), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
+          <% Milestone.each do |milestone|
+            if milestone.project_id == @project.id %>
+              ['<%= milestone.name %>', '<%= milestone.name %>', new Date(Date.parse("<%= milestone.start_date %>".replace('-','/','g'))),
+                  new Date(Date.parse("<%= milestone.deadline %>".replace('-','/','g'))), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
 
-                  <% Task.each do |task| 
-                    if task.project_id == @project.id && task.milestone_id == milestone.id %>
-                      ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(Date.parse("<%= task.start_date %>".replace('-','/','g'))), 
-                        new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.name %>'],
-                  <% end %>
-                <% end %>
-              <% end %>
-            <% end %>
-      ]);
-
-      <% Milestone.each do |milestone| %>
-        numRows++;
-      <% end %>      
-      <% Task.each do |task| %>
-        numRows++;
+              <% Task.each do |task|
+                if task.project_id == @project.id && task.milestone_id == milestone.id %>
+                  ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(Date.parse("<%= task.start_date %>".replace('-','/','g'))),
+                      new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.name %>'],
+                 <% end %>
+               <% end %>
+             <% end %>
+           <% end %>
+        ]);
+    <% else %>
+        document.getElementById('error').innerHTML = "No milestones found for this project.";
       <% end %>
+
       var options = {
-          height: 45 * numRows,
+          height: 45 * (numMiles + numTasks) * 10,
 
           gantt: {
             criticalPathEnabled: false, // Critical path arrows will be the same as other arrows.
@@ -82,7 +83,9 @@
 
       var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
 
-      chart.draw(data, options);
+      <% if DB[:milestones].count != 0 %>
+        chart.draw(data, options);
+      <% end %>
     }
   </script>
   <style>
@@ -97,3 +100,4 @@
 </div>
 
 <%= erb :footer %>
+
