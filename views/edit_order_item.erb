@@ -16,13 +16,7 @@
 <td><input type="text" name="unit_cost" value="<%= "$%.2f" % @item.unit_cost %>" style="width: 80px" /></td>
 <td>&nbsp;</td>
 <td>
-  <select name="requested_by" style="width: 125px">
-    <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
-    <option value="<%= user.first_name %> <%= user.last_name %>">
-      <%= user.first_name %> <%= user.last_name %>
-    </option>
-    <% end %>
-  </select>
+  <td><input type="text" name="requested_by" style="width: 125px" readonly value="<%= @user.first_name %> <%= @user.last_name %>"></td>
 </td>
 <td><input type="text" name="notes" value="<%= CGI.escapeHTML(@item.notes) %>" style="width: 200px" /></td>
 <td>
