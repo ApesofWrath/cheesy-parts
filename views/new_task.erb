@@ -14,6 +14,7 @@
     <!-- Change assignee -->
     <label>Assignee</label>
     <select name="assignee">
+      <option value="" selected disabled hidden>Select assignee</option>
       <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
       <option value="<%= user.first_name %> <%= user.last_name %>">
         <%= user.first_name %> <%= user.last_name %>
@@ -35,7 +36,7 @@
     <select name="milestone_id">
       <% Milestone.where(:project_id => @project.id).each do |milestone| %>
       <option value="<%= milestone.id %>">
-        <%= milestone.name %>
+        <%= if Milestone.where(:project_id => @project.id).empty? ? "No milestones found" : milestone.name %>
       </option>
       <% end %>
     </select>

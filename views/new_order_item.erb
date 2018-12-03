@@ -6,7 +6,7 @@
       <th>Part Number</th>
       <th>Description</th>
       <th>Unit Cost</th>
-      <th>Requested By</th>      
+      <th>Requested By</th>
       <th>Notes</th>
       <th>&nbsp;</th>
     </tr>
@@ -16,15 +16,7 @@
       <td><input type="text" name="part_number" style="width: 100px" /></td>
       <td><input type="text" name="description" style="width: 200px" /></td>
       <td><input type="text" name="unit_cost" style="width: 80px" /></td>
-      <td>
-      <select name="requested_by" style="width: 125px">
-        <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
-        <option value="<%= user.first_name %> <%= user.last_name %>">
-          <%= user.first_name %> <%= user.last_name %>
-        </option>
-        <% end %>
-      </select>
-      </td>
+      <td><input type="text" name="requested_by" style="width: 125px" readonly value="<%= @user.first_name %> <%= @user.last_name %>"></td>
       <td><input type="text" name="notes" style="width: 200px" /></td>
       <td>
         <input type="submit" value="Save" class="btn btn-primary btn-small">
