@@ -455,6 +455,7 @@ module CheesyParts
       halt(400, "Missing part type.") if params[:type].nil?
       halt(400, "Invalid part type.") unless Part::PART_TYPES.include?(params[:type])
       halt(400, "Missing part name.") if params[:name].nil? || params[:name].empty?
+      halt(400, "Missing assignee.") if params[:assignee].nil? || params[:assignee].empty?
       if params[:parent_part_id] && params[:parent_part_id] !~ /^\d+$/
         halt(400, "Invalid parent part ID.")
       end
@@ -483,7 +484,7 @@ module CheesyParts
       part.print_part = 0
       part.drawing_link = ""
       part.gcode_link = ""
-      part.assignee = params[:assignee].gsub("\"", "&quot;")
+      part.assignee = params[:assignee].gsub("\"", "&quot;") if params[:assignee]
       part.milestone_id = params[:milestone_id];
       part.save
       redirect "/parts/#{part.id}"
@@ -797,6 +798,7 @@ module CheesyParts
 
     post "/projects/:id/order_items" do
       require_permission(@user.can_edit?)
+      halt(400, "Need to say who is requesting the order.") if params[:requested_by].nil? || params[:requested_by].empty?
       halt(400, "Need reason for request.") if params[:notes].nil? || params[:notes].empty?
 
       # Match vendor to an existing open order or create it if there isn't one.
