@@ -34,10 +34,16 @@
 
     <label>Milestone</label>
     <select name="milestone_id">
-      <% Milestone.where(:project_id => @project.id).each do |milestone| %>
-      <option value="<%= milestone.id %>">
-        <%= if Milestone.where(:project_id => @project.id).empty? ? "No milestones found" : milestone.name %>
-      </option>
+      <% if Milestone.where(:project_id => @project.id).empty? %>
+        <option value="-1">
+          "No milestones found"
+        </option>
+      <% else
+        Milestone.where(:project_id => @project.id).each do |milestone| %>
+        <option value="<%= milestone.id %>">
+            <%= milestone.name %>
+        </option>
+        <% end %>
       <% end %>
     </select>
 

@@ -342,10 +342,11 @@ module CheesyParts
       halt(400, "Invalid project.") if project.nil?
       subteam = Subteam[params[:subteam]]
       halt(400, "Invalid subteam.") if subteam.nil?
+      halt(400, "No milestones found. Please create one for this project (#{project.name}).") if params[:milestone_id] == "-1"
       halt(400, "Invalid milestone.") if params[:milestone_id].nil? || params[:milestone_id].empty?
       halt(400, "Missing assignee.") if params[:assignee].nil? || params[:assignee].empty?
+      halt(400, "Missing start date.") if params[:start_date].nil? || params[:start_date].empty?
       halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
-      halt(400, "Missing start date.") if params[:start_date].nil? || params[:start_date].empty?  
       halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
 
       begin
@@ -462,6 +463,7 @@ module CheesyParts
 
       project = Project[params[:project_id].to_i]
       halt(400, "Invalid project.") if project.nil?
+      halt(400, "No milestones found. Please create one for this project (#{project.name}).") if params[:milestone_id] == "-1"
 
       parent_part = nil
       if params[:parent_part_id]
