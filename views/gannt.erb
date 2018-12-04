@@ -14,11 +14,9 @@
   <script type="text/javascript">
     google.charts.load('current', {'packages':['gantt']});
     google.charts.setOnLoadCallback(drawChart);
-
     function daysToMilliseconds(days) {
       return days * 24 * 60 * 60 * 1000;
     }
-
     function drawChart() {
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Task ID');
@@ -29,35 +27,44 @@
       data.addColumn('number', 'Percent Complete');
       data.addColumn('string', 'Dependencies');
 
-      var numMiles = <%= DB[:milestones].count %>
-      var numTasks = <%= DB[:tasks].count %>
+      var numMiles = 0;
+      <% dataset = DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first %>
+      <% numMiles = dataset[:"COUNT(*)"].to_i %>
+      numMiles = <%= numMiles %>;
+      var numTasks = 0;
+      <% dataset1 = DB.fetch("SELECT COUNT(*) FROM tasks WHERE project_id = ? LIMIT 1;", @project.id).first %>
+      <% numTasks = dataset1[:"COUNT(*)"].to_i %>
+      numTasks = <%= numTasks %>;
 
-      <% if DB[:milestones].count != 0 %>
+      <% mileRows = Array.new(numMiles) %>
+      <% rows = 0 %>
+
+      <% if numMiles != 0 %>
         data.addRows([
           <% Milestone.each do |milestone|
             if milestone.project_id == @project.id %>
-              ['<%= milestone.name %>', '<%= milestone.name %>', new Date(Date.parse("<%= milestone.start_date %>".replace('-','/','g'))),
+              ['<%= milestone.id %>', '<%= milestone.name %>', new Date(Date.parse("<%= milestone.start_date %>".replace('-','/','g'))),
                   new Date(Date.parse("<%= milestone.deadline %>".replace('-','/','g'))), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
+              <% rows = rows + 1 %>
 
               <% Task.each do |task|
                 if task.project_id == @project.id && task.milestone_id == milestone.id %>
                   ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(Date.parse("<%= task.start_date %>".replace('-','/','g'))),
-                      new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.name %>'],
-                 <% end %>
-               <% end %>
-             <% end %>
-           <% end %>
+                      new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.id %>'],
+                <% rows = rows + 1 %>
+                <% end %>
+              <% end %>
+            <% end %>
+            <% mileRows.push(rows) %>
+          <% end %>
         ]);
-    <% else %>
+      <% else %>
         document.getElementById('error').innerHTML = "No milestones found for this project.";
       <% end %>
-
       var options = {
           height: 45 * (numMiles + numTasks) * 10,
-
           gantt: {
             criticalPathEnabled: false, // Critical path arrows will be the same as other arrows.
-
             palette: [
               {
                 "color": "#4f92ff",
@@ -65,14 +72,12 @@
                 "light": "#99beff"
               }
             ],
-
             innerGridHorizLine: {
               stroke: '#ffffff',
               strokeWidth: 1
             },
             innerGridTrack: {fill: '#efefef'},
             innerGridDarkTrack: {fill: '#c1c1c19'},
-
             arrow: {
               angle: 45,
               color: '#474747',
@@ -80,12 +85,34 @@
             }
           }
       };
-
       var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
-
-      <% if DB[:milestones].count != 0 %>
+      <% if dataset1[:"COUNT(*)"].to_i != 0 %>
         chart.draw(data, options);
-      <% end %>
+    <% end %>
+
+    /* Clicking redirects for milestones */
+    google.visualization.events.addListener(chart, 'select', selectHandler);
+
+      function selectHandler() {
+        var selection = chart.getSelection();
+        var id = 0;
+        var row = -1;
+        var mileRows = [];
+
+        <% mileRows.each do |v| %>
+            mileRows.push(<%= v %>);
+        <% end %>
+
+        for (var i = 0; i < selection.length; i++) {
+           var item = selection[i];
+           id = data.getFormattedValue(item.row, 0);
+           row = item.row;
+        }
+        if(mileRows.includes(row) && id != 0)
+          window.location.href = "/milestones/" + id;
+        else
+          window.location.href = "/tasks/" + id;
+      }
     }
   </script>
   <style>
@@ -100,4 +127,3 @@
 </div>
 
 <%= erb :footer %>
-
