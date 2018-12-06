@@ -43,14 +43,14 @@
         data.addRows([
           <% Milestone.each do |milestone|
             if milestone.project_id == @project.id %>
-              ['<%= milestone.id %>', '<%= milestone.name %>', new Date(Date.parse("<%= milestone.start_date %>".replace('-','/','g'))),
-                  new Date(Date.parse("<%= milestone.deadline %>".replace('-','/','g'))), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
+        ['<%= milestone.id %>', '<%= milestone.name %>', new Date(<%= milestone.start_date.to_s[0,4] %>, <%= milestone.start_date.to_s[5,7].to_i - 1 %>, <%= milestone.start_date.to_s[8,9] %>),
+                  new Date(<%= milestone.deadline.to_s[0,4] %>, <%= milestone.deadline.to_s[5,7].to_i - 1 %>, <%= milestone.deadline.to_s[8,9] %>), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
               <% rows = rows + 1 %>
 
               <% Task.each do |task|
                 if task.project_id == @project.id && task.milestone_id == milestone.id %>
-                  ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(Date.parse("<%= task.start_date %>".replace('-','/','g'))),
-                      new Date(Date.parse("<%= task.deadline %>".replace('-','/','g'))), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.id %>'],
+                  ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(<%= task.start_date.to_s[0,4] %>, <%= task.start_date.to_s[5,7].to_i - 1 %>, <%= task.start_date.to_s[8,9] %>),
+                      new Date(<%= task.deadline.to_s[0,4] %>, <%= task.deadline.to_s[5,7].to_i - 1 %>, <%= task.deadline.to_s[8,9] %>), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.id %>'],
                 <% rows = rows + 1 %>
                 <% end %>
               <% end %>
