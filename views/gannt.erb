@@ -28,12 +28,12 @@
       data.addColumn('string', 'Dependencies');
 
       var numMiles = 0;
-      <% dataset = DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first %>
-      <% numMiles = dataset[:"COUNT(*)"].to_i %>
+      <% mileData = DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first %>
+      <% numMiles = mileData[:"COUNT(*)"].to_i %>
       numMiles = <%= numMiles %>;
       var numTasks = 0;
-      <% dataset1 = DB.fetch("SELECT COUNT(*) FROM tasks WHERE project_id = ? LIMIT 1;", @project.id).first %>
-      <% numTasks = dataset1[:"COUNT(*)"].to_i %>
+      <% taskData = DB.fetch("SELECT COUNT(*) FROM tasks WHERE project_id = ? LIMIT 1;", @project.id).first %>
+      <% numTasks = taskData[:"COUNT(*)"].to_i %>
       numTasks = <%= numTasks %>;
 
       <% mileRows = Array.new(numMiles) %>
@@ -86,9 +86,9 @@
           }
       };
       var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
-      <% if dataset1[:"COUNT(*)"].to_i != 0 %>
+      <% if numMiles != 0 %>
         chart.draw(data, options);
-    <% end %>
+      <% end %>
 
     /* Clicking redirects for milestones */
     google.visualization.events.addListener(chart, 'select', selectHandler);
