@@ -2,6 +2,12 @@
 
 <div class="container">
   <h2>Create New <%= @type.capitalize %></h2>
+  
+  <% if DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first[:"COUNT(*)"].to_i == 0 %>
+    <p>No milestones found for this project. Please go create one before creating a part/assembly.</p>
+    <a href="/projects/<%= @project.id %>">&larr;Back to project</a>
+  <% else %>
+  
   <form action="/parts" method="POST">
     <input type=hidden name=type value="<%= @type %>" />
     
@@ -50,6 +56,7 @@
       <input type="submit" class="btn btn-success btn-medium" value="Create <%= @type.capitalize %>">
     </label>
   </form>
+  <% end %>
 </div>
 
 <%= erb :footer %>

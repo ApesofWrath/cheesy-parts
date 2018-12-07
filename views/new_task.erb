@@ -2,6 +2,11 @@
 
 <div class="container">
   <h2>Create New Task</h2>
+
+  <% if DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first[:"COUNT(*)"].to_i == 0 %>
+    <p>No milestones found for this project. Please go create one before creating a task.</p>
+    <a href="/projects/<%= @project.id %>">&larr;Back to project</a>
+  <% else %>
   <form action="/tasks" method="POST">
     <label>Task Name</label>
     <input type="text" name="name" />
@@ -57,6 +62,7 @@
     <textarea name="notes" rows="4"></textarea>
     <label><input type="submit" class="btn btn-success btn-medium" value="Create Task"></label>
   </form>
+  <% end %>
 </div>
 
 <%= erb :footer %>
