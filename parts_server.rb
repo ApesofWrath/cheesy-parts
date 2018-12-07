@@ -160,8 +160,8 @@ module CheesyParts
       require_permission(@user.can_administer?)
 
       # Check parameter existence and format.
-      halt(400, "Missing project name.") if params[:name].nil?
-      halt(400, "Missing part number prefix.") if params[:part_number_prefix].nil?
+      halt(400, "Missing project name.") if params[:name].nil? || params[:name] == ""
+      halt(400, "Missing part number prefix.") if params[:part_number_prefix].nil? || params[:part_number_prefix] == ""
 
       project = Project.create(:name => params[:name], :part_number_prefix => params[:part_number_prefix], :hide_dashboards => false)
       redirect "/projects/#{project.id}"
@@ -283,13 +283,8 @@ module CheesyParts
 
       @milestone = Milestone[params[:id]]
       project_id = @milestone.project_id
-  #    id = @milestone.id
       halt(400, "Invalid task.") if @milestone.nil?
       @milestone.delete
-
- #     Part.where(id => @part.milestone_id).each do |part|
-#        part.milestone_id = 0
-
 
       params[:referrer] = nil if params[:referrer] =~ /\/milestones\/#{params[:id]}$/
       redirect params[:referrer] || "/projects/#{project_id}"
