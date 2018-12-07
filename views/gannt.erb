@@ -45,7 +45,9 @@
             if milestone.project_id == @project.id %>
         ['<%= milestone.id %>', '<%= milestone.name %>', new Date(<%= milestone.start_date.to_s[0,4] %>, <%= milestone.start_date.to_s[5,7].to_i - 1 %>, <%= milestone.start_date.to_s[8,9] %>),
                   new Date(<%= milestone.deadline.to_s[0,4] %>, <%= milestone.deadline.to_s[5,7].to_i - 1 %>, <%= milestone.deadline.to_s[8,9] %>), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
-              <% rows = rows + 1 %>
+
+            <% mileRows.push(rows) %>
+            <% rows = rows + 1 %>
 
               <% Task.each do |task|
                 if task.project_id == @project.id && task.milestone_id == milestone.id %>
@@ -55,7 +57,6 @@
                 <% end %>
               <% end %>
             <% end %>
-            <% mileRows.push(rows) %>
           <% end %>
         ]);
       <% else %>
