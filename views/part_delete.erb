@@ -4,7 +4,7 @@
   <h2>Are you sure you want to delete <%= @part.type %> <%= @part.name %>?</h2>
   <form action="" method="POST">
     <input type="submit" class="btn btn-danger btn-medium" value="Yes" />
-    <a href="/projects/<%= @part.project.id %>" class="btn btn-primary btn-medium">No</a>
+    <a href="<%= request.referrer %>" class="btn btn-primary btn-medium">No</a>
     <input type="hidden" name="referrer" value="<%= @referrer %>" />
   </form>
 </div>
