@@ -8,7 +8,8 @@ Sequel.migration do
       String :part_number
       String :description
       Decimal :unit_cost, :size => [10, 2]
-      Text :notes
+      Text :link
+      Text :reason
     end
   end
 end
