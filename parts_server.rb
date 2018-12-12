@@ -906,14 +906,14 @@ module CheesyParts
             $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Order placed!",
       				     :as_user => true, :attachments => [{"fallback":"Order from #{@order.vendor_name} has been placed",
       								       "color":"warning", "author_name":"#{@order.vendor_name} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{@order.id}",
-      								       "title":"#{@order.vendor_name} order has been placed", "text":"Order placed by #{params[:paid_for_by]} at #{params[:ordered_at]}",
+      								       "title":"#{@order.vendor_name} order has been placed", "text":"Order placed by #{params[:paid_for_by]} on #{params[:ordered_at]}",
                              "fields":[{"title":"Total cost", "value":"#{('$' + ('%.2f' % @order.total_cost))}", "short":true},
                                        {"title":"Order status", "value":"#{params[:status]}", "short":true}]}])
           elsif params[:status].include?"received"
             $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Order received!",
       				     :as_user => true, :attachments => [{"fallback":"Order from #{@order.vendor_name} has been received",
       								       "color":"good", "author_name":"#{@order.vendor_name} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{@order.id}",
-      								       "title":"#{@order.vendor_name} order has been received", "text":"Order placed by #{params[:paid_for_by]} at #{params[:ordered_at]}",
+      								       "title":"#{@order.vendor_name} order has been received", "text":"Order placed by #{params[:paid_for_by]} on #{params[:ordered_at]}",
                                            "fields":[{"title":"Total cost", "value":"#{('$' + ('%.2f' % @order.total_cost))}", "short":true},
                                        {"title":"Order status", "value":"#{params[:status]}", "short":true}]}])
           end
