@@ -820,9 +820,7 @@ module CheesyParts
         $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Item added to order list!",
   				     :as_user => true, :attachments => [{"fallback":"#{params[:quantity]} of #{params[:part_number]} added to #{params[:vendor]} order list",
   								       "color":"danger", "author_name":"#{params[:vendor]} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{order_id}",
-  								       "title":"Item Ordered", "text":"#{params[:description]} (PN: #{params[:part_number]})",
-                                       "title":"Link", "text":"#{params[:link]} (requested by #{params[:requested_by]})",
-                                       "title":"Reason", "text":"#{params[:reason]}",
+                                       "title":"Reason", "text":"#{params[:reason] (requested by params[:requested_by])}",
                                        "fields":[{"title":"Quantity", "value":"#{params[:quantity]}", "short":true},
                                                  {"title":"Unit cost", "value":"#{('$' + ('%.2f' % (params[:unit_cost].gsub(/\$/, '').to_f).to_s))}", "short":true}]}])
       end
