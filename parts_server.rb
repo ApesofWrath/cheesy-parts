@@ -255,8 +255,17 @@ module CheesyParts
       begin
         milestone = Milestone.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :start_date => params[:start_date], :notes => params[:notes], :status => "in_progress") 
         milestone.save
-      rescue Sequel::UniqueConstraintViolation
-        halt(400, "Milestone already exists.")
+        rescue Sequel::UniqueConstraintViolation
+          halt(400, "Milestone already exists.")
+      end
+
+      if CheesyCommon::Config.enable_slack_integrations
+          $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "New milestone created for #{project.name}",
+                                       :as_user => true, :attachments => [{"fallback":"#{params[:name]} added to #{project.name}",
+  								       "color":"danger", "author_name":"#{params[:name]} Milestone Status", "author_link":"#{CheesyCommon::Config.base_address}/milestones/#{milestone.id}",
+                                       "title":"Notes", "text":"#{params[:notes]}",
+                                       "fields":[{"title":"Start Date", "value":"#{params[:start_date]}", "short":true},
+                                                 {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
       end
 
       redirect "/milestones/#{milestone.id}"
@@ -347,8 +356,17 @@ module CheesyParts
       begin
         task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :status => "in_progress", :start_date => params[:start_date]) 
         task.save
-      rescue Sequel::UniqueConstraintViolation
-        halt(400, "Task already exists.")
+        rescue Sequel::UniqueConstraintViolation
+          halt(400, "Task already exists.")
+      end
+
+      if CheesyCommon::Config.enable_slack_integrations
+        $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "New task created for #{params[:assignee]}",
+                                       :as_user => true, :attachments => [{"fallback":"#{params[:name]} added to #{project.name}",
+  								       "color":"danger", "author_name":"#{params[:name]} Task Status", "author_link":"#{CheesyCommon::Config.base_address}/tasks/#{task.id}",
+                                       "title":"Notes", "text":"#{params[:notes]}",
+                                       "fields":[{"title":"Milestone", "value":"#{task.milestone.name}", "short":true},
+                                                 {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
       end
 
       redirect "/tasks/#{task.id}"
@@ -399,6 +417,16 @@ module CheesyParts
       @task.deadline = params[:deadline] if params[:deadline]
       @task.notes = params[:notes] if params[:notes]
       @task.save
+
+      if CheesyCommon::Config.enable_slack_integrations
+        $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "Task for #{params[:assignee]} has been edited!",
+                                       :as_user => true, :attachments => [{"fallback":"#{params[:name]} has been edited for #{@task.project.name}",
+  								       "color":"danger", "author_name":"#{params[:name]} Task Status", "author_link":"#{CheesyCommon::Config.base_address}/tasks/#{@task.id}",
+                                       "title":"Notes", "text":"#{params[:notes]}",
+                                       "fields":[{"title":"Milestone", "value":"#{@task.milestone.name}", "short":true},
+                                                 {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
+      end
+
       redirect params[:referrer] || "/tasks/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
     end   
 
