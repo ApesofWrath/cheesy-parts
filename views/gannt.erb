@@ -3,7 +3,7 @@
 <div class="container">
   <div class="row">
     <div class="span2">
-      <h2><%= @project.name.gsub(" ", "&nbsp;") %></h2>
+      <h2><a href="/projects/<%= @project.id %>" id="project"><%= @project.name.gsub(" ", "&nbsp;") %></a></h2>
     </div>
   </div>
 
@@ -122,6 +122,20 @@
       width: 100%;
       height: 100%;
       border-radius: .5rem;
+    }
+    
+    a:link {
+      text-decoration: none;
+      color: black;
+    }
+
+    a:visited {
+      text-decoration: none;
+      color: black;
+    }
+
+    a:hover {
+      text-decoration: underline;
     }
   </style>
   <div id="chart_div"></div>
