@@ -27,6 +27,7 @@
     "oauth_callback_url": "http://parts.apesofwrath668.org/login",
     "base_address": "http://parts.apesofwrath668.org",
     "slack_orders_room": "orders",
-    "slack_parts_room": "machining"
+    "slack_parts_room": "machining",
+    "slack_schedule_room": "schedule"
   }
 }

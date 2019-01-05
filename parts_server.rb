@@ -259,14 +259,14 @@ module CheesyParts
           halt(400, "Milestone already exists.")
       end
 
-      if CheesyCommon::Config.enable_slack_integrations
-          $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "New milestone created for #{project.name}",
-                                       :as_user => true, :attachments => [{"fallback":"#{params[:name]} added to #{project.name}",
-  								       "color":"danger", "author_name":"#{params[:name]} Milestone Status", "author_link":"#{CheesyCommon::Config.base_address}/milestones/#{milestone.id}",
-                                       "title":"Notes", "text":"#{params[:notes]}",
-                                       "fields":[{"title":"Start Date", "value":"#{params[:start_date]}", "short":true},
-                                                 {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
-      end
+      #if CheesyCommon::Config.enable_slack_integrations
+      #    $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "New milestone created for #{project.name}!",
+      #                                 :as_user => true, :attachments => [{"fallback":"#{params[:name]} added to #{project.name}",
+  	  #							       "color":"danger", "author_name":"#{params[:name]} Milestone Status", "author_link":"#{CheesyCommon::Config.base_address}/milestones/#{milestone.id}",
+      #                                 "title":"Notes", "text":"#{params[:notes]}",
+      #                                 "fields":[{"title":"Start Date", "value":"#{params[:start_date]}", "short":true},
+      #                                           {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
+      #end
 
       redirect "/milestones/#{milestone.id}"
     end     
@@ -293,6 +293,14 @@ module CheesyParts
       @milestone = Milestone[params[:id]]
       project_id = @milestone.project_id
       halt(400, "Invalid task.") if @milestone.nil?
+
+      #if CheesyCommon::Config.enable_slack_integrations
+      #    $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "Milestone has been deleted from #{@milestone.project.name}!",
+      #                                 :as_user => true, :attachments => [{"fallback":"#{params[:name]} deleted from #{@milestone.project.name}",
+  	  #							       "color":"danger", "author_name":"#{params[:name]} Gantt Chart", "author_link":"#{CheesyCommon::Config.base_address}/planning/#{@milestone.project.id}", 
+      #                                 "title":"Name", "text":"#{@milestone.name}"}])
+      #end
+
       @milestone.delete
 
       params[:referrer] = nil if params[:referrer] =~ /\/milestones\/#{params[:id]}$/
@@ -327,6 +335,16 @@ module CheesyParts
       @milestone.deadline = params[:deadline] if params[:deadline]
       @milestone.notes = params[:notes] if params[:notes]
       @milestone.save
+
+      #if CheesyCommon::Config.enable_slack_integrations
+      #    $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "Milestone edited for #{@milestone.project.name}!",
+      #                                 :as_user => true, :attachments => [{"fallback":"#{params[:name]} edited for #{@milestone.project.name}",
+  	  #							       "color":"danger", "author_name":"#{params[:name]} Milestone Status", "author_link":"#{CheesyCommon::Config.base_address}/milestones/#{@milestone.id}",
+      #                                 "title":"Notes", "text":"#{params[:notes]}",
+      #                                 "fields":[{"title":"Start Date", "value":"#{params[:start_date]}", "short":true},
+      #                                           {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
+      #end
+      
       redirect params[:referrer] || "/milestones/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
     end
 
@@ -360,14 +378,14 @@ module CheesyParts
           halt(400, "Task already exists.")
       end
 
-      if CheesyCommon::Config.enable_slack_integrations
-        $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "New task created for #{params[:assignee]}",
-                                       :as_user => true, :attachments => [{"fallback":"#{params[:name]} added to #{project.name}",
-  								       "color":"danger", "author_name":"#{params[:name]} Task Status", "author_link":"#{CheesyCommon::Config.base_address}/tasks/#{task.id}",
-                                       "title":"Notes", "text":"#{params[:notes]}",
-                                       "fields":[{"title":"Milestone", "value":"#{task.milestone.name}", "short":true},
-                                                 {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
-      end
+      #if CheesyCommon::Config.enable_slack_integrations
+      #  $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "New task created for #{params[:assignee]}!",
+      #                                 :as_user => true, :attachments => [{"fallback":"#{params[:name]} added to #{project.name}",
+  	  #							       "color":"danger", "author_name":"#{params[:name]} Task Status", "author_link":"#{CheesyCommon::Config.base_address}/tasks/#{task.id}",
+      #                                "title":"Notes", "text":"#{params[:notes]}",
+      #                                 "fields":[{"title":"Milestone", "value":"#{task.milestone.name}", "short":true},
+      #                                           {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
+      #end
 
       redirect "/tasks/#{task.id}"
     end     
@@ -418,14 +436,14 @@ module CheesyParts
       @task.notes = params[:notes] if params[:notes]
       @task.save
 
-      if CheesyCommon::Config.enable_slack_integrations
-        $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "Task for #{params[:assignee]} has been edited!",
-                                       :as_user => true, :attachments => [{"fallback":"#{params[:name]} has been edited for #{@task.project.name}",
-  								       "color":"danger", "author_name":"#{params[:name]} Task Status", "author_link":"#{CheesyCommon::Config.base_address}/tasks/#{@task.id}",
-                                       "title":"Notes", "text":"#{params[:notes]}",
-                                       "fields":[{"title":"Milestone", "value":"#{@task.milestone.name}", "short":true},
-                                                 {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
-      end
+      #if CheesyCommon::Config.enable_slack_integrations
+      #  $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_schedule_room, :text => "Task for #{params[:assignee]} has been edited!",
+      #                                 :as_user => true, :attachments => [{"fallback":"#{params[:name]} has been edited for #{@task.project.name}",
+  	  #							       "color":"danger", "author_name":"#{params[:name]} Task Status", "author_link":"#{CheesyCommon::Config.base_address}/tasks/#{@task.id}",
+      #                                 "title":"Notes", "text":"#{params[:notes]}",
+      #                                 "fields":[{"title":"Milestone", "value":"#{@task.milestone.name}", "short":true},
+      #                                           {"title":"Deadline", "value":"#{params[:deadline]}", "short":true}]}])
+      #end
 
       redirect params[:referrer] || "/tasks/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
     end   
