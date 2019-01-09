@@ -530,6 +530,8 @@ module CheesyParts
         new_part_status = params[:status]
         @part.status = params[:status]
       end
+
+      @part.parent_part_id = params[:parent_part_id]
       @part.milestone_id = params[:milestone_id] if params[:milestone_id]
       @part.notes = params[:notes] if params[:notes]
       @part.source_material = params[:source_material] if params[:source_material]
