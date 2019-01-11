@@ -553,7 +553,7 @@ module CheesyParts
           $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_parts_room, :text => "New part ready for manufacturing!",
                  :as_user => true, :attachments => [{"fallback":"Part ready to manufacturing",
                            "color":"good", "author_name":"Part ready to manufacture", "author_link":"#{CheesyCommon::Config.base_address}/parts/#{@part.id}",
-                           "title":"Part name", "text":"#{@part.name}",
+                           "title":"Part name", "text":"#{@part.name.gsub! '&quot;', '"' }",
                            "fields":[{"title":"Material", "value":"#{@part.source_material}", "short":true},
                                      {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
                                      {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
