@@ -557,8 +557,8 @@ module CheesyParts
                            "fields":[{"title":"Material", "value":"#{@part.source_material}", "short":true},
                                      {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
                                      {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
-                                     {"title":"CNC Part?", "value":"#{@part.cnc_part ? "Yes" : "No"}", "short":true},
-                                     {"title":"3D Print Part?", "value":"#{@part.print_part ? "Yes" : "No"}", "short":true},
+                                     {"title":"CNC Part?", "value":"#{@part.cnc_part == 1 ? "Yes" : "No"}", "short":true},
+                                     {"title":"3D Print Part?", "value":"#{@part.print_part == 1 ? "Yes" : "No"}", "short":true},
                                      {"title":"Drawing Link", "value":"#{@part.drawing_link}", "short":true},
                                      {"title":"Gcode Link", "value":"#{@part.gcode_link}", "short":true},
                                      {"title":"Notes", "value":"#{@part.notes}", "short":false}]}])
