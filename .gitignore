@@ -2,4 +2,3 @@
 *.pid
 vendor
 SlackBot
-config.json
