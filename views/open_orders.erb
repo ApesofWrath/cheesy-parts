@@ -21,13 +21,22 @@
     <h4>No open orders found</h4>
     <a href="/orders">&larr;Back</a>
   <% else %>
-    <% @vendor_orders.each do |order| %>
-      <a href="/projects/<%= @project.id %>/orders/<%= order.id %>" style="color: black;"><h2>
-        <%= order.vendor_name %>
-        <%= order.ordered_at.strftime("%F") rescue "" %>
-        <span class="label label-status-<%= order.status %>"><%= Order::STATUS_MAP[order.status] %></span>
-      </h2></a>
-      <%= erb :order_items_list, :locals => { :order_items => order.order_items, :order => order } %>
+    <% @vendor_orders.each do |order|
+      count = 0
+      OrderItem.where(:project_id => order.project_id).each do |item|
+        if item.order_id == order.id
+          count = count + 1
+        end
+      end
+
+      if count > 0  %>
+        <a href="/projects/<%= @project.id %>/orders/<%= order.id %>" style="color: black;"><h2>
+          <%= order.vendor_name %>
+          <%= order.ordered_at.strftime("%F") rescue "" %>
+          <span class="label label-status-<%= order.status %>"><%= Order::STATUS_MAP[order.status] %></span>
+        </h2></a>
+        <%= erb :order_items_list, :locals => { :order_items => order.order_items, :order => order } %>
+      <% end %>
     <% end %>  
   <% end %>
 </div>

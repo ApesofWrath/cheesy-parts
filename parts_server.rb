@@ -749,8 +749,7 @@ module CheesyParts
 
     get "/projects/:id/orders/open" do
       @no_vendor_order_items = OrderItem.where(:order_id => nil, :project_id => params[:id])
-      @vendor_orders = Order.filter(:status => "open").where(:project_id => params[:id]).
-          order(:vendor_name, :ordered_at)
+      @vendor_orders = Order.filter(:status => "open").where(:project_id => params[:id]).order(:vendor_name, :ordered_at)
       @show_new_item_form = params[:new_item] == "true"
       erb :open_orders
     end
