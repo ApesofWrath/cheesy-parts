@@ -1,18 +1,18 @@
 {
   "global": {
     "db_host": "localhost",
-    "db_user": "cheesy_parts_user",
-    "db_database": "cheesy_parts",
+    "db_user": "root",
+    "db_database": "ApesParts",
     "port": 9000,
     "gmail_user": "parts@apesofwrath668.org",
     "user_domain_whitelist": "@apesofwrath668.org",
     "enable_wordpress_auth": false,
     "enable_google_oauth": true,
     "enable_slack_integrations": true,
-    "slack_api_token": "xoxb-264940389040-b0MDcKQ9tXcazO0LUBnA3SRz"
+    "slack_api_token": "xoxp-98596831910-175979719637-516876117457-1c104ed485b74a5bfc72f0d786753ac1"
     },
   "dev": {
-    "db_password": "correcthorsebatterystaple",
+    "db_password": "waterski93",
     "gmail_password": "correcthorsebatterystaple",
     "members_url": "http://members.team254.dev:8081",
     "oauth_callback_url": "http://localhost:9000/login",
