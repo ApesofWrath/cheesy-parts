@@ -7,8 +7,17 @@
     </div>
   </div>
 
-  <iframe width="1200" height="900" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vR8ZUhvrVS5WYqi2gPSMjxK29ioXCVfoCZjyMG--dWaL0dNO_XTqNqH5rnXPiwr_DZo1ZpVCNxCLEXy/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-
+  <% if @project.id == 10 %>
+    <iframe width="1200" height="900" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vR8ZUhvrVS5WYqi2gPSMjxK29ioXCVfoCZjyMG--dWaL0dNO_XTqNqH5rnXPiwr_DZo1ZpVCNxCLEXy/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+  <% else %>
+    <p>No gantt chart available for this project.</p>
+  <% end %>
 </div>
+
+<style>
+  a {
+    color: #333333;
+  }
+</style>
 
 <%= erb :footer %>

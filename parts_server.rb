@@ -177,7 +177,7 @@ module CheesyParts
       if ["type", "name", "parent_part_id", "status", "assignee"].include?(params[:sort])
         @part_sort = params[:sort].to_sym
       else
-        @part_sort = :id
+        @part_sort = :part_number
       end
       erb :project
     end
@@ -496,7 +496,7 @@ module CheesyParts
       if ["type", "name", "parent_part_id", "status"].include?(params[:sort])
         @part_sort = params[:sort].to_sym
       else
-        @part_sort = :id
+        @part_sort = :part_number
       end
       erb :part
     end
@@ -553,12 +553,12 @@ module CheesyParts
           $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_parts_room, :text => "New part ready for manufacturing!",
                  :as_user => true, :attachments => [{"fallback":"Part ready to manufacturing",
                            "color":"good", "author_name":"Part ready to manufacture", "author_link":"#{CheesyCommon::Config.base_address}/parts/#{@part.id}",
-                           "title":"Part name", "text":"#{@part.name}",
+                           "title":"Part name", "text":"#{@part.name.gsub! '&quot;', '"' }",
                            "fields":[{"title":"Material", "value":"#{@part.source_material}", "short":true},
                                      {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
                                      {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
-                                     {"title":"CNC Part?", "value":"#{@part.cnc_part ? "Yes" : "No"}", "short":true},
-                                     {"title":"3D Print Part?", "value":"#{@part.print_part ? "Yes" : "No"}", "short":true},
+                                     {"title":"CNC Part?", "value":"#{@part.cnc_part == 1 ? "Yes" : "No"}", "short":true},
+                                     {"title":"3D Print Part?", "value":"#{@part.print_part == 1 ? "Yes" : "No"}", "short":true},
                                      {"title":"Drawing Link", "value":"#{@part.drawing_link}", "short":true},
                                      {"title":"Gcode Link", "value":"#{@part.gcode_link}", "short":true},
                                      {"title":"Notes", "value":"#{@part.notes}", "short":false}]}])
