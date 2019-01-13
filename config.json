@@ -9,7 +9,7 @@
     "enable_wordpress_auth": false,
     "enable_google_oauth": true,
     "enable_slack_integrations": true,
-    "slack_api_token": "xoxb-264940389040-b0MDcKQ9tXcazO0LUBnA3SRz"
+    "slack_api_token": "Encrypted:DVPsHj5Tj/caiYaZlf4F1yZ+WtWdkPw7JAjzXo4UPi0lBlp5HuOdcyc1CPpJZrA8Wph7yikJipx9FKEVkGvfM/vhV9vwUuwKA46++NrKHqA=\n"
     },
   "dev": {
     "db_password": "correcthorsebatterystaple",
@@ -28,6 +28,7 @@
     "base_address": "http://parts.apesofwrath668.org",
     "slack_orders_room": "orders",
     "slack_parts_room": "machining",
-    "slack_schedule_room": "schedule"
+    "slack_schedule_room": "schedule",
+    "slack_testing_room": "testing"
   }
 }
