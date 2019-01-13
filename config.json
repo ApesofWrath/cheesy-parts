@@ -9,7 +9,7 @@
     "enable_wordpress_auth": false,
     "enable_google_oauth": true,
     "enable_slack_integrations": true,
-    "slack_api_token": "Encrypted:DVPsHj5Tj/caiYaZlf4F1yZ+WtWdkPw7JAjzXo4UPi0lBlp5HuOdcyc1CPpJZrA8Wph7yikJipx9FKEVkGvfM/vhV9vwUuwKA46++NrKHqA=\n"
+    "slack_api_token": "Encrypted:GzHBTneISldcTXEfGxQt/aONLJINrfvEHkGFcxWHibpNwC2QxSMd/IYmB+9i\nXD8NXTGZvjAoN7Zbtm/LTbupo+FkdAPUs3v9KjXE/p7bVBM=\n"
     },
   "dev": {
     "db_password": "correcthorsebatterystaple",
