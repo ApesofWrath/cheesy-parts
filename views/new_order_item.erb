@@ -1,29 +1,23 @@
 <form action="/projects/<%= @project.id %>/order_items" method="POST">
-  <table class="table table-striped table-condensed table-bordered">
-    <tr>
-      <th>Vendor</th>
-      <th>Quantity</th>
-      <th>Part Number</th>
-      <th>Description</th>
-      <th>Unit Cost</th>
-      <th>Requested By</th>
-      <th>Notes</th>
-      <th>&nbsp;</th>
-    </tr>
-    <tr>
-      <td><input type="text" name="vendor" style="width: 200px" id="vendor" autocomplete="off" /></td>
-      <td><input type="text" name="quantity" style="width: 30px" /></td>
-      <td><input type="text" name="part_number" style="width: 100px" /></td>
-      <td><input type="text" name="description" style="width: 200px" /></td>
-      <td><input type="text" name="unit_cost" style="width: 80px" /></td>
-      <td><input type="text" name="requested_by" style="width: 125px" readonly value="<%= @user.first_name %> <%= @user.last_name %>"></td>
-      <td><input type="text" name="notes" style="width: 200px" /></td>
-      <td>
-        <input type="submit" value="Save" class="btn btn-primary btn-small">
-        <a href="/projects/<%= @project.id %>/orders/open" class="btn btn-danger btn-small">
-          <i class="icon-white icon-trash"></i>
-        </a>
-      </td>
-    </tr>
-  </table>
+      <label>Vendor</label>
+      <input type="text" name="vendor" id="vendor" autocomplete="off" />
+      <label>Quantity</label>
+      <input type="text" name="quantity" />
+      <label>Part Number</label>
+      <input type="text" name="part_number" />
+      <label>Description</label>
+      <input type="text" name="description" />
+      <label>Unit Cost</label>
+      <input type="text" name="unit_cost" />
+      <label>Requested By</label>
+      <input type="text" name="requested_by" readonly value="<%= @user.first_name %> <%= @user.last_name %>">
+      <label>Link</label>
+      <input type="text" name="link" />
+      <label>Reason</label>
+      <textarea name="reason" rows="5" cols="40" placeholder="What is this for and why do we need it?" ></textarea>
+      <br>
+      <input type="submit" value="Save" class="btn btn-primary btn-small">
+      <a href="/projects/<%= @project.id %>/orders/open" class="btn btn-danger btn-small">
+        <i class="icon-white icon-trash"></i>
+      </a>
 </form>

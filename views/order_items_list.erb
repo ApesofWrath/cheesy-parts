@@ -8,7 +8,8 @@
       <th>Unit Cost</th>
       <th>Total Cost</th>
       <th>Requested By</th>
-      <th>Notes</th>
+      <th>Link</th>
+      <th>Reason</th>
       <% if @user.can_edit? %>
         <th>Action</th>
       <% end %>
@@ -26,7 +27,8 @@
         <td><%= "$%.2f" % item.unit_cost %></td>
         <td><%= "$%.2f" % item.total_cost %></td>
         <td><%= item.requested_by %></td>
-        <td><%= item.notes %></td>
+        <td><%= item.link %></td>
+        <td><%= item.reason %></td>
         <% if @user.can_edit? %>
           <td>
             <a class="btn btn-primary btn-small" onclick="editOrderItem(<%= @project.id %>, <%= item.id %>);">

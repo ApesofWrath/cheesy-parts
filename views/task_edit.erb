@@ -45,7 +45,7 @@
     <label>Milestone</label>
     <select name="milestone_id">
       <% Milestone.where(:project_id => @task.project_id).each do |milestone| %>
-      <option value="<%= milestone.id %>">
+          <option value="<%= milestone.id %>" <% if @task.milestone_id == milestone.id %> selected <% end %>>
         <%= milestone.name %>
       </option>
       <% end %>
@@ -58,7 +58,7 @@
     <input type="text" <% unless @user.can_edit? %>disabled <% end %>class="datepicker" data-date-format="yyyy-mm-dd" name="deadline" value="<%= @task.deadline.strftime("%F") rescue "" %>"/>
 
     <label>Notes</label>
-    <textarea name="notes" rows="4" value="<%= @task.notes %>"></textarea>
+    <textarea name="notes" rows="4"><%= @task.notes %></textarea>
     <label><input type="submit" class="btn btn-primary btn-medium" value="Save Task"></label>
   </form>
 </div>

@@ -3,128 +3,21 @@
 <div class="container">
   <div class="row">
     <div class="span2">
-      <h2><%= @project.name.gsub(" ", "&nbsp;") %></h2>
+      <h2 id="project_title"><a href="/projects/<%= @project.id %>" id="project"><%= @project.name.gsub(" ", "&nbsp;") %></a></h2>
     </div>
   </div>
 
-  <p id="error"></p>
-
-  <!-- Gannt Chart -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    google.charts.load('current', {'packages':['gantt']});
-    google.charts.setOnLoadCallback(drawChart);
-    function daysToMilliseconds(days) {
-      return days * 24 * 60 * 60 * 1000;
-    }
-    function drawChart() {
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Task ID');
-      data.addColumn('string', 'Task Name');
-      data.addColumn('date', 'Start Date');
-      data.addColumn('date', 'End Date');
-      data.addColumn('number', 'Duration');
-      data.addColumn('number', 'Percent Complete');
-      data.addColumn('string', 'Dependencies');
-
-      var numMiles = 0;
-      <% mileData = DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first %>
-      <% numMiles = mileData[:"COUNT(*)"].to_i %>
-      numMiles = <%= numMiles %>;
-      var numTasks = 0;
-      <% taskData = DB.fetch("SELECT COUNT(*) FROM tasks WHERE project_id = ? LIMIT 1;", @project.id).first %>
-      <% numTasks = taskData[:"COUNT(*)"].to_i %>
-      numTasks = <%= numTasks %>;
-
-      <% mileRows = Array.new(numMiles) %>
-      <% rows = 0 %>
-
-      <% if numMiles != 0 %>
-        data.addRows([
-          <% Milestone.each do |milestone|
-            if milestone.project_id == @project.id %>
-        ['<%= milestone.id %>', '<%= milestone.name %>', new Date(<%= milestone.start_date.to_s[0,4] %>, <%= milestone.start_date.to_s[5,7].to_i - 1 %>, <%= milestone.start_date.to_s[8,9] %>),
-                  new Date(<%= milestone.deadline.to_s[0,4] %>, <%= milestone.deadline.to_s[5,7].to_i - 1 %>, <%= milestone.deadline.to_s[8,9] %>), null, <%= milestone.status == "finished" ? 100 : 0 %>,  null],
-
-            <% mileRows.push(rows) %>
-            <% rows = rows + 1 %>
-
-              <% Task.each do |task|
-                if task.project_id == @project.id && task.milestone_id == milestone.id %>
-                  ['<%= task.id %>', '<%= task.name %> (<%= task.sub_name %>)', new Date(<%= task.start_date.to_s[0,4] %>, <%= task.start_date.to_s[5,7].to_i - 1 %>, <%= task.start_date.to_s[8,9] %>),
-                      new Date(<%= task.deadline.to_s[0,4] %>, <%= task.deadline.to_s[5,7].to_i - 1 %>, <%= task.deadline.to_s[8,9] %>), null, <%= task.status == "finished" ? 100 : 0 %>, '<%= task.milestone.id %>'],
-                <% rows = rows + 1 %>
-                <% end %>
-              <% end %>
-            <% end %>
-          <% end %>
-        ]);
-      <% else %>
-        document.getElementById('error').innerHTML = "No milestones found for this project.";
-      <% end %>
-      var options = {
-          height: 45 * (numMiles + numTasks) * 10,
-          gantt: {
-            criticalPathEnabled: false, // Critical path arrows will be the same as other arrows.
-            palette: [
-              {
-                "color": "#4f92ff",
-                "dark": "#005a9c",
-                "light": "#99beff"
-              }
-            ],
-            innerGridHorizLine: {
-              stroke: '#ffffff',
-              strokeWidth: 1
-            },
-            innerGridTrack: {fill: '#efefef'},
-            innerGridDarkTrack: {fill: '#c1c1c19'},
-            arrow: {
-              angle: 45,
-              color: '#474747',
-              radius: 3
-            }
-          }
-      };
-      var chart = new google.visualization.Gantt(document.getElementById('chart_div'));
-      <% if numMiles != 0 %>
-        chart.draw(data, options);
-      <% end %>
-
-    /* Clicking redirects for milestones */
-    google.visualization.events.addListener(chart, 'select', selectHandler);
-
-      function selectHandler() {
-        var selection = chart.getSelection();
-        var id = 0;
-        var row = -1;
-        var mileRows = [];
-
-        <% mileRows.each do |v| %>
-            mileRows.push(<%= v %>);
-        <% end %>
-
-        for (var i = 0; i < selection.length; i++) {
-           var item = selection[i];
-           id = data.getFormattedValue(item.row, 0);
-           row = item.row;
-        }
-        if(mileRows.includes(row) && id != 0)
-          window.location.href = "/milestones/" + id;
-        else
-          window.location.href = "/tasks/" + id;
-      }
-    }
-  </script>
-  <style>
-    #chart_div {
-      overflow: hidden;
-      width: 100%;
-      height: 100%;
-      border-radius: .5rem;
-    }
-  </style>
-  <div id="chart_div"></div>
+  <% if @project.id == 10 %>
+    <iframe width="1200" height="900" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vR8ZUhvrVS5WYqi2gPSMjxK29ioXCVfoCZjyMG--dWaL0dNO_XTqNqH5rnXPiwr_DZo1ZpVCNxCLEXy/pubhtml?gid=0&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+  <% else %>
+    <p>No gantt chart available for this project.</p>
+  <% end %>
 </div>
+
+<style>
+  #project_title a {
+    color: #333333;
+  }
+</style>
 
 <%= erb :footer %>

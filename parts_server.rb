@@ -177,7 +177,7 @@ module CheesyParts
       if ["type", "name", "parent_part_id", "status", "assignee"].include?(params[:sort])
         @part_sort = params[:sort].to_sym
       else
-        @part_sort = :id
+        @part_sort = :part_number
       end
       erb :project
     end
@@ -255,8 +255,8 @@ module CheesyParts
       begin
         milestone = Milestone.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :start_date => params[:start_date], :notes => params[:notes], :status => "in_progress") 
         milestone.save
-      rescue Sequel::UniqueConstraintViolation
-        halt(400, "Milestone already exists.")
+        rescue Sequel::UniqueConstraintViolation
+          halt(400, "Milestone already exists.")
       end
 
       redirect "/milestones/#{milestone.id}"
@@ -284,6 +284,7 @@ module CheesyParts
       @milestone = Milestone[params[:id]]
       project_id = @milestone.project_id
       halt(400, "Invalid task.") if @milestone.nil?
+
       @milestone.delete
 
       params[:referrer] = nil if params[:referrer] =~ /\/milestones\/#{params[:id]}$/
@@ -318,6 +319,7 @@ module CheesyParts
       @milestone.deadline = params[:deadline] if params[:deadline]
       @milestone.notes = params[:notes] if params[:notes]
       @milestone.save
+
       redirect params[:referrer] || "/milestones/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
     end
 
@@ -347,8 +349,8 @@ module CheesyParts
       begin
         task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :status => "in_progress", :start_date => params[:start_date]) 
         task.save
-      rescue Sequel::UniqueConstraintViolation
-        halt(400, "Task already exists.")
+        rescue Sequel::UniqueConstraintViolation
+          halt(400, "Task already exists.")
       end
 
       redirect "/tasks/#{task.id}"
@@ -399,6 +401,7 @@ module CheesyParts
       @task.deadline = params[:deadline] if params[:deadline]
       @task.notes = params[:notes] if params[:notes]
       @task.save
+
       redirect params[:referrer] || "/tasks/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
     end   
 
@@ -493,7 +496,7 @@ module CheesyParts
       if ["type", "name", "parent_part_id", "status"].include?(params[:sort])
         @part_sort = params[:sort].to_sym
       else
-        @part_sort = :id
+        @part_sort = :part_number
       end
       erb :part
     end
@@ -527,6 +530,8 @@ module CheesyParts
         new_part_status = params[:status]
         @part.status = params[:status]
       end
+
+      @part.parent_part_id = params[:parent_part_id]
       @part.milestone_id = params[:milestone_id] if params[:milestone_id]
       @part.notes = params[:notes] if params[:notes]
       @part.source_material = params[:source_material] if params[:source_material]
@@ -548,12 +553,12 @@ module CheesyParts
           $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_parts_room, :text => "New part ready for manufacturing!",
                  :as_user => true, :attachments => [{"fallback":"Part ready to manufacturing",
                            "color":"good", "author_name":"Part ready to manufacture", "author_link":"#{CheesyCommon::Config.base_address}/parts/#{@part.id}",
-                           "title":"Part name", "text":"#{@part.name}",
+                           "title":"Part name", "text":"#{@part.name.gsub! '&quot;', '"' }",
                            "fields":[{"title":"Material", "value":"#{@part.source_material}", "short":true},
                                      {"title":"Quantity", "value":"#{@part.quantity}", "short":true},
                                      {"title":"Priority", "value":"#{Part::PRIORITY_MAP[@part.priority]}", "short":true},
-                                     {"title":"CNC Part?", "value":"#{@part.cnc_part ? "Yes" : "No"}", "short":true},
-                                     {"title":"3D Print Part?", "value":"#{@part.print_part ? "Yes" : "No"}", "short":true},
+                                     {"title":"CNC Part?", "value":"#{@part.cnc_part == 1 ? "Yes" : "No"}", "short":true},
+                                     {"title":"3D Print Part?", "value":"#{@part.print_part == 1 ? "Yes" : "No"}", "short":true},
                                      {"title":"Drawing Link", "value":"#{@part.drawing_link}", "short":true},
                                      {"title":"Gcode Link", "value":"#{@part.gcode_link}", "short":true},
                                      {"title":"Notes", "value":"#{@part.notes}", "short":false}]}])
@@ -604,6 +609,7 @@ module CheesyParts
       halt(400, "Missing deadline.") if params[:deadline].nil?
 
       task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam], :notes => params[:notes], :milestone_name => "")
+      
       redirect "/subteams/#{task.sub_name}"
     end
 
@@ -743,8 +749,7 @@ module CheesyParts
 
     get "/projects/:id/orders/open" do
       @no_vendor_order_items = OrderItem.where(:order_id => nil, :project_id => params[:id])
-      @vendor_orders = Order.filter(:status => "open").where(:project_id => params[:id]).
-          order(:vendor_name, :ordered_at)
+      @vendor_orders = Order.filter(:status => "open").where(:project_id => params[:id]).order(:vendor_name, :ordered_at)
       @show_new_item_form = params[:new_item] == "true"
       erb :open_orders
     end
@@ -796,7 +801,8 @@ module CheesyParts
     post "/projects/:id/order_items" do
       require_permission(@user.can_edit?)
       halt(400, "Need to say who is requesting the order.") if params[:requested_by].nil? || params[:requested_by].empty?
-      halt(400, "Need reason for request.") if params[:notes].nil? || params[:notes].empty?
+      halt(400, "Link is missing.") if params[:link].nil? || params[:link].empty? 
+      halt(400, "Need reason for request.") if params[:reason].nil? || params[:reason].empty?
 
       # Match vendor to an existing open order or create it if there isn't one.
       if params[:vendor].nil? || params[:vendor].empty?
@@ -812,14 +818,13 @@ module CheesyParts
 
       OrderItem.create(:project => @project, :order_id => order_id, :quantity => params[:quantity].to_i,
                        :part_number => params[:part_number], :description => params[:description],
-                       :unit_cost => params[:unit_cost].gsub(/\$/, "").to_f, :requested_by => params[:requested_by], :notes => params[:notes])
+                       :unit_cost => params[:unit_cost].gsub(/\$/, "").to_f, :requested_by => params[:requested_by], :link => params[:link], :reason => params[:reason])
 
       if CheesyCommon::Config.enable_slack_integrations
         $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Item added to order list!",
   				     :as_user => true, :attachments => [{"fallback":"#{params[:quantity]} of #{params[:part_number]} added to #{params[:vendor]} order list",
   								       "color":"danger", "author_name":"#{params[:vendor]} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{order_id}",
-  								       "title":"Item Ordered", "text":"#{params[:description]} (PN: #{params[:part_number]})",
-                                       "title":"Notes", "text":"#{params[:notes]} (requested by #{params[:requested_by]})",
+                                       "title":"Reason", "text":"#{params[:reason]} (requested by #{params[:requested_by]})",
                                        "fields":[{"title":"Quantity", "value":"#{params[:quantity]}", "short":true},
                                                  {"title":"Unit cost", "value":"#{('$' + ('%.2f' % (params[:unit_cost].gsub(/\$/, '').to_f).to_s))}", "short":true}]}])
       end
@@ -855,7 +860,7 @@ module CheesyParts
 
       @item.update(:order_id => order_id, :quantity => params[:quantity].to_i,
                    :part_number => params[:part_number], :description => params[:description],
-                   :unit_cost => params[:unit_cost].gsub(/\$/, ""), :requested_by => params[:requested_by], :notes => params[:notes])
+                   :unit_cost => params[:unit_cost].gsub(/\$/, ""), :requested_by => params[:requested_by], :link => params[:link], :reason => params[:reason])
       redirect params[:referrer]
     end
 
@@ -903,15 +908,15 @@ module CheesyParts
             $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Order placed!",
       				     :as_user => true, :attachments => [{"fallback":"Order from #{@order.vendor_name} has been placed",
       								       "color":"warning", "author_name":"#{@order.vendor_name} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{@order.id}",
-      								       "title":"#{@order.vendor_name} order has been placed", "text":"Order placed by #{params[:paid_for_by]} at #{params[:ordered_at]}",
-                             "fields":[{"title":"Total cost", "value":"$#{@order.total_cost}", "short":true},
+      								       "title":"#{@order.vendor_name} order has been placed", "text":"Order placed by #{params[:paid_for_by]} on #{params[:ordered_at]}",
+                             "fields":[{"title":"Total cost", "value":"#{('$' + ('%.2f' % @order.total_cost))}", "short":true},
                                        {"title":"Order status", "value":"#{params[:status]}", "short":true}]}])
           elsif params[:status].include?"received"
             $slack_client.chat_postMessage(:token => CheesyCommon::Config.slack_api_token, :channel => CheesyCommon::Config.slack_orders_room, :text => "Order received!",
       				     :as_user => true, :attachments => [{"fallback":"Order from #{@order.vendor_name} has been received",
       								       "color":"good", "author_name":"#{@order.vendor_name} Order Status", "author_link":"#{CheesyCommon::Config.base_address}/projects/#{@project.id}/orders/#{@order.id}",
-      								       "title":"#{@order.vendor_name} order has been received", "text":"Order placed by #{params[:paid_for_by]} at #{params[:ordered_at]}",
-                             "fields":[{"title":"Total cost", "value":"$#{@order.total_cost}", "short":true},
+      								       "title":"#{@order.vendor_name} order has been received", "text":"Order placed by #{params[:paid_for_by]} on #{params[:ordered_at]}",
+                                           "fields":[{"title":"Total cost", "value":"#{('$' + ('%.2f' % @order.total_cost))}", "short":true},
                                        {"title":"Order status", "value":"#{params[:status]}", "short":true}]}])
           end
         end

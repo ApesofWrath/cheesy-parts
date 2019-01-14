@@ -17,6 +17,18 @@
       <% end %>
     </select>
 
+    <!-- Parent Assembly -->
+    <label>Parent Assembly</label>
+    <select name="parent_part_id">
+      <% Part.where(:project_id => @part.project_id).each do |part| %>
+        <% if part.type == "assembly" %>
+          <option value="<%= part.id %>"<% if part.id.to_i == @part.parent_part_id.to_i %> selected<% end %>>
+            <%= part.full_part_number %> - <%= part.name %>
+          </option>
+        <% end %>
+      <% end %>
+    </select>
+
     <!-- Change assignee -->
     <label>Assignee</label>
     <select name="assignee">
@@ -29,7 +41,7 @@
 
     <!-- Milestone -->
     <label>Milestone</label>
-    <select name="milestone_name">
+    <select name="milestone_id">
         <% Milestone.where(:project_id => @part.project_id).each do |milestone| %>
       <option value="<%= milestone.name %>" <% if @part.milestone_id == milestone.id %> selected<% end %>>
         <%= milestone.name %>
