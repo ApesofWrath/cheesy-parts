@@ -433,7 +433,7 @@ module CheesyParts
     end
 
     get "/planning/:id" do
-      erb :gannt
+      erb :gantt
     end
 
     # Dashboards
