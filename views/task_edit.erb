@@ -12,23 +12,30 @@
     <input type="text" disabled value="<%= @task.project.name %>" />
     <input type="hidden" name="project_id" value="<%= @task.project_id %>" />
 
-    <!-- Change Status -->
-    <label>Status</label>
-    <select name="status">
-      <% Task::STATUS.each_pair do |key, value| %>
-        <option value="<%= key %>"<% if @task.status == key %> selected<% end %>>
-          <%= value %>
-        </option>
-      <% end %>
-    </select>
- 
     <!-- Change assignee -->
     <label>Assignee</label>
     <select name="assignee">
       <% User.where(:enabled => 1).order_append(:last_name).order_append(:first_name).each do |user| %>
-      <option value="<%= user.first_name %> <%= user.last_name %>" <% if @task.assignee == (user.first_name + " " + user.last_name) %> selected<% end %>>    
-        <%= user.first_name %> <%= user.last_name %>
-      </option>
+        <option value="<%= user.first_name %> <%= user.last_name %>" <% if @task.assignee == (user.first_name + " " + user.last_name) %> selected<% end %>>    
+          <%= user.first_name %> <%= user.last_name %>
+        </option>
+      <% end %>
+    </select>
+
+    <!-- Update Completion Percentage -->
+    <label>Percent Complete</label>
+    <input type="number" name="per_comp" value="<%= @task.per_comp %>" min="0" max="100">
+
+    <!-- Dependent Task -->
+    <label>Dependent Task</label>
+    <select name="dep_task_id">
+      <option value="" selected>None</option>
+      <% Task.each do |task|
+        if @task.project_id == task.project_id %>
+          <option value="<%= task.id %>" <% if @task.dep_task_id && @task.dep_task_id == task.id %> selected<% end %>>
+            <%= task.name %>
+          </option>
+        <% end %>
       <% end %>
     </select>
 
@@ -36,9 +43,9 @@
     <label>Subteam</label>
     <select name="subteam">
       <% Subteam.each do |subteam| %>
-      <option value="<%= subteam.name %>" <% if @task.sub_name == subteam.name %> selected<% end %>>
-        <%= subteam.name %>
-      </option>
+        <option value="<%= subteam.name %>" <% if @task.sub_name == subteam.name %> selected<% end %>>
+          <%= subteam.name %>
+        </option>
       <% end %>
     </select>    
 

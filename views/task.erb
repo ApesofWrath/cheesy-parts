@@ -9,9 +9,9 @@
       <td><a href="/projects/<%= @task.project_id %>"><b><%= @task.project.name %></b></a></td>
     </tr>
     <tr>
-      <td><b>Status</b></td>
+      <td><b>Completion</b></td>
       <td>
-        <span class="label label-status-<%= @task.status %>"><%= Task::STATUS[@task.status] %></span>
+        <%= @task.per_comp %>%
       </td>
     </tr>
     <tr>
@@ -28,6 +28,20 @@
           <% else %>
             <a href="/milestones/<%= @task.milestone_id %>"><%= @task.milestone.name %></a> 
           <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td><b>Dependent On</b></td>
+      <td>
+          <% if @task.dep_task_id
+             Task.each do |task|
+               if @task.dep_task_id == task.id %>
+                 <%= task.name %>
+               <% end %>
+             <% end %>
+           <% else %>
+               None
+         <% end %>
       </td>
     </tr>
     <tr><td><b>Deadline</b></td><td><%= @task.deadline %></td></tr>

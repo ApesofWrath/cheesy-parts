@@ -9,7 +9,8 @@ Sequel.migration do
       Date :start_date, :null => false
       String :milestone_id, :null => false
       String :assignee, :null => false
-      String :status, :null => false
+      Integer :per_comp, :null => false
+      Integer :dep_task_id
       String :notes
     end
   end
