@@ -72,9 +72,9 @@
                 pDepend: "",
                 pCaption: "",
                 pLink: "/milestones/<%= milestone.id %>",
-                pNotes: "<%= milestone.notes %>",
-                category: "Planning",
-                sector: "CMO"
+                pNotes: `<%= milestone.notes %>`,
+                category: "",
+                sector: ""
               });
 
               <% Task.each do |task|
@@ -97,9 +97,9 @@
                       pDepend: <%= task.dep_task_id ? task.dep_task_id : "\"\"" %>,
                       pCaption: "",
                       pLink: "/tasks/<%= task.id %>",
-                      pNotes: "<%= task.notes %>",
-                      category: "Planning",
-                      sector: "CMO"
+                      pNotes: `<%= task.notes %>`,
+                      category: "",
+                      sector: ""
                   });
                 <% end %>
               <% end %>
