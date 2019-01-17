@@ -49,6 +49,8 @@
 
       <% mileData = DB.fetch("SELECT COUNT(*) FROM milestones WHERE project_id = ? LIMIT 1;", @project.id).first %>
       <% numMiles = mileData[:"COUNT(*)"].to_i %>
+      <% mileRow = 0 %>
+      <% colors = ["gtaskblue", "gtaskred", "gtaskpink", "gtaskgreen", "gtaskpurple", "gtaskyellow"] %>
 
       <% if numMiles != 0 %>
 
@@ -86,7 +88,7 @@
                       pEnd: "<%= task.deadline.to_s[0,4] %>-<%= task.deadline.to_s[5,7] %>-<%= task.deadline.to_s[8,9] %>",
                       pPlanStart: "",
                       pPlanEnd: "",
-                      pClass: "gtaskblue",
+                      pClass: "<%= colors[mileRow % colors.length] %>",
                       pLink: "",
                       pMile: 0,
                       pRes: "<%= task.assignee[0,task.assignee.index(' ') + 2] %>",
@@ -103,6 +105,7 @@
                   });
                 <% end %>
               <% end %>
+              <% mileRow = mileRow + 1 %>
             <% end %>
           <% end %>
       <% else %>
