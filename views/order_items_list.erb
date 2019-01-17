@@ -27,7 +27,7 @@
         <td><%= "$%.2f" % item.unit_cost %></td>
         <td><%= "$%.2f" % item.total_cost %></td>
         <td><%= item.requested_by %></td>
-        <td><%= item.link %></td>
+        <td><a href="<%= item.link %>" target="_blank"><%= item.link %></a></td>
         <td><%= item.reason %></td>
         <% if @user.can_edit? %>
           <td>
