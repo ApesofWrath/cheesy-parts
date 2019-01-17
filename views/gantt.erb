@@ -89,7 +89,7 @@
                       pClass: "gtaskblue",
                       pLink: "",
                       pMile: 0,
-                      pRes: "<%= task.assignee %>",
+                      pRes: "<%= task.assignee[0,task.assignee.index(' ') + 2] %>",
                       pComp: <%= task.per_comp %>,
                       pGroup: 0,
                       pParent: <%= task.milestone.id %>,
