@@ -1,11 +1,18 @@
 <%= erb :header %>
 
-<div class="container">
-  <h2>Are you sure you want to delete the milestone &quot;<%= @milestone.name %>&quot;?</h2>
+<div class="container">  
   <form action="" method="POST">
-    <input type="submit" class="btn btn-danger btn-medium" value="Yes" />
-    <a href="<%= request.referrer %>" class="btn btn-primary btn-medium">No</a>
-    <input type="hidden" name="referrer" value="<%= @referrer %>" />
+
+    <% if Task.where(:milestone_id => @milestone.id).empty? %>
+      <h2>Are you sure you want to delete the milestone &quot;<%= @milestone.name %>&quot;?</h2>
+      <input type="submit" class="btn btn-danger btn-medium" value="Yes" />
+      <a href="<%= request.referrer %>" class="btn btn-primary btn-medium">No</a>
+      <input type="hidden" name="referrer" value="<%= @referrer %>" />
+    <% else %>
+      <h2>This milestone has child tasks. Delete child tasks before deleting this milestone.</h2>
+      <a href="<%= request.referrer %>" class="btn btn-primary btn-medium">Back</a>
+      <input type="hidden" name="referrer" value="<%= @referrer %>" />
+    <% end %>
   </form>
 </div>
 
