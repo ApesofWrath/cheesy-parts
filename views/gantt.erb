@@ -30,6 +30,7 @@
             vLang: 'en',
             vShowTaskInfoLink: 1, // Show link in tool tip (0/1)
             vShowEndWeekDate: 0, // Show/Hide the date for the last day of the week in header for daily
+            vTooltipDelay: 300,  // How long to show info after removing mouse hover
             /*vAdditionalHeaders: { // Add data columns to your table
                 subteam: {
                     title: 'Subteam'
@@ -51,6 +52,7 @@
       <% numMiles = mileData[:"COUNT(*)"].to_i %>
       <% mileRow = 0 %>
       <% colors = ["gtaskblue", "gtaskred", "gtaskpink", "gtaskgreen", "gtaskpurple", "gtaskyellow"] %>
+
 
       <% if numMiles != 0 %>
 
