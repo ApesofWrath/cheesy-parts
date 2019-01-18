@@ -53,7 +53,6 @@
       <% mileRow = 0 %>
       <% colors = ["gtaskblue", "gtaskred", "gtaskpink", "gtaskgreen", "gtaskpurple", "gtaskyellow"] %>
 
-
       <% if numMiles != 0 %>
 
           <% Milestone.each do |milestone|
@@ -85,7 +84,7 @@
                 if task.project_id == @project.id && task.milestone_id == milestone.id %>
                   g.AddTaskItemObject({
                       pID: <%= task.id %>,
-                      pName: "<%= task.name %> (<%= task.sub_name %>)",
+                      pName: "<a href='/tasks/<%= task.id %>' target='_blank'><%= task.name %> (<%= task.sub_name %>)</a>",
                       pStart: "<%= task.start_date.to_s[0,4] %>-<%= task.start_date.to_s[5,7] %>-<%= task.start_date.to_s[8,9] %>",
                       pEnd: "<%= task.deadline.to_s[0,4] %>-<%= task.deadline.to_s[5,7] %>-<%= task.deadline.to_s[8,9] %>",
                       pPlanStart: "",
