@@ -8,7 +8,7 @@
     "enable_wordpress_auth": false,
     "enable_google_oauth": true,
     "enable_slack_integrations": true,
-    "slack_api_token": "Encrypted:paFa5GHui7JhyaiynZ8nMczWy/JhSZMU/VpFZF5qptpuUHSNkcVLgTSNVHAy\nhqvQlfrMNZrnY3g9pnijM5jOaw==\n"
+    "slack_api_token": "Encrypted:paFa5GHui7JhyaiynZ8nMbNTyN/dvT/OABcUwNwy9415yi24X5s7ofpzpa7V\nzuzlS57OkNh0oxhwZrOED8gYbQ==\n"
     },
   "dev": {
     "db_database": "ApesParts",

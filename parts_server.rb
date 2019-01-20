@@ -27,10 +27,10 @@ module CheesyParts
       authenticate! unless ["/login", "/register"].include?(request.path)
       if CheesyCommon::Config.enable_slack_integrations
         Slack.configure do |config|
-  	  #     config.token = CheesyCommon::Config.slack_api_token
+  	       config.token = CheesyCommon::Config.slack_api_token
         end
         $slack_client = Slack::Web::Client.new
-      #  $slack_client.auth_test
+        $slack_client.auth_test
       end
     end
 
