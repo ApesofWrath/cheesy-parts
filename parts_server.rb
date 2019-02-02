@@ -27,10 +27,10 @@ module CheesyParts
       authenticate! unless ["/login", "/register"].include?(request.path)
       if CheesyCommon::Config.enable_slack_integrations
         Slack.configure do |config|
-  	  #     config.token = CheesyCommon::Config.slack_api_token
+          config.token = CheesyCommon::Config.slack_api_token
         end
         $slack_client = Slack::Web::Client.new
-      #  $slack_client.auth_test
+        $slack_client.auth_test
       end
     end
 
@@ -113,7 +113,7 @@ module CheesyParts
           client_secrets = Google::APIClient::ClientSecrets.load
           $auth_client = client_secrets.to_authorization
           $auth_client.update!(
-            :scope => ['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/plus.me','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
+            :scope => ['profile', 'openid', 'email'],
             :redirect_uri => CheesyCommon::Config.oauth_callback_url
           )
           auth_uri = $auth_client.authorization_uri.to_s
