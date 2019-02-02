@@ -91,6 +91,7 @@ module CheesyParts
           oauth_service = Google::Apis::Oauth2V2::Oauth2Service.new
           oauth_service.authorization = $auth_client
           profile = oauth_service.get_userinfo(:fields => 'email,id,name')
+
           unless profile.email.include? CheesyCommon::Config.user_domain_whitelist
             redirect "/"
           end
@@ -113,7 +114,7 @@ module CheesyParts
           client_secrets = Google::APIClient::ClientSecrets.load
           $auth_client = client_secrets.to_authorization
           $auth_client.update!(
-            :scope => ['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/plus.me','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
+            :scope => ['profile','openid','email'],
             :redirect_uri => CheesyCommon::Config.oauth_callback_url
           )
           auth_uri = $auth_client.authorization_uri.to_s
@@ -235,7 +236,7 @@ module CheesyParts
 
       erb :new_milestone
     end
-    
+
     # Created Milestone
     post "/milestones" do
       require_permission(@user.can_edit?)
@@ -250,17 +251,17 @@ module CheesyParts
       halt(400, "Invalid project.") if project.nil?
       halt(400, "Missing deadline.") if params[:deadline].nil? || params[:deadline].empty?
       halt(400, "Missing start date.") if params[:start_date].nil? || params[:start_date].empty?
-      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date  
+      halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
 
       begin
-        milestone = Milestone.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :start_date => params[:start_date], :notes => params[:notes], :status => "in_progress") 
+        milestone = Milestone.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :start_date => params[:start_date], :notes => params[:notes], :status => "in_progress")
         milestone.save
         rescue Sequel::UniqueConstraintViolation
           halt(400, "Milestone already exists.")
       end
 
       redirect "/milestones/#{milestone.id}"
-    end     
+    end
 
     # Milestone
     get "/milestones/:id" do
@@ -347,14 +348,14 @@ module CheesyParts
       halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
 
       begin
-        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :per_comp => 0, :dep_task_id => params[:dep_task_id], :start_date => params[:start_date]) 
+        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :per_comp => 0, :dep_task_id => params[:dep_task_id], :start_date => params[:start_date])
         task.save
         rescue Sequel::UniqueConstraintViolation
           halt(400, "Task already exists.")
       end
 
       redirect "/tasks/#{task.id}"
-    end     
+    end
 
     # Task
     get "/tasks/:id" do
@@ -399,7 +400,7 @@ module CheesyParts
       @task.save
 
       redirect params[:referrer] || "/tasks/#{params[:id]}" unless !params[:redirect].nil? && params[:redirect]
-    end   
+    end
 
     get "/tasks/:id/delete" do
       require_permission(@user.can_edit?)
@@ -425,7 +426,7 @@ module CheesyParts
     get "/planning" do
       erb :planning
     end
-    
+
     # Check that it is a valid project id
     before "/planning/:id*" do
       @project = Project[params[:id]]
@@ -586,7 +587,7 @@ module CheesyParts
     end
 
     # Subteam pages
-    # Check that it is a valid subteam   
+    # Check that it is a valid subteam
     before "/subteams/:name*" do
       @subteam = Subteam[params[:name]]
       halt(400, "Invalid subteam \"#{params[:name]}\"") if @subteam.nil?
@@ -595,7 +596,7 @@ module CheesyParts
     # Subteam page (with tasks)
     get "/subteams/:subteam" do
       erb :subteam
-    end    
+    end
 
     # Back to sub page after creating task
     post "/subteams/:subteam" do
@@ -605,7 +606,7 @@ module CheesyParts
       halt(400, "Missing deadline.") if params[:deadline].nil?
 
       task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :sub_name => params[:subteam], :notes => params[:notes], :milestone_name => "")
-      
+
       redirect "/subteams/#{task.sub_name}"
     end
 
@@ -797,7 +798,7 @@ module CheesyParts
     post "/projects/:id/order_items" do
       require_permission(@user.can_edit?)
       halt(400, "Need to say who is requesting the order.") if params[:requested_by].nil? || params[:requested_by].empty?
-      halt(400, "Link is missing.") if params[:link].nil? || params[:link].empty? 
+      halt(400, "Link is missing.") if params[:link].nil? || params[:link].empty?
       halt(400, "Need reason for request.") if params[:reason].nil? || params[:reason].empty?
 
       # Match vendor to an existing open order or create it if there isn't one.
