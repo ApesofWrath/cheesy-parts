@@ -2,16 +2,16 @@
   "global": {
     "db_host": "localhost",
     "db_user": "cheesy_parts_user",
-    "db_database": "cheesy_parts",
     "port": 9000,
     "gmail_user": "parts@apesofwrath668.org",
     "user_domain_whitelist": "@apesofwrath668.org",
     "enable_wordpress_auth": false,
     "enable_google_oauth": true,
     "enable_slack_integrations": true,
-    "slack_api_token": "Encrypted:paFa5GHui7JhyaiynZ8nMczWy/JhSZMU/VpFZF5qptpuUHSNkcVLgTSNVHAy\nhqvQlfrMNZrnY3g9pnijM5jOaw==\n"
+    "slack_api_token": "Encrypted:paFa5GHui7JhyaiynZ8nMbNTyN/dvT/OABcUwNwy9415yi24X5s7ofpzpa7V\nzuzlS57OkNh0oxhwZrOED8gYbQ==\n"
     },
   "dev": {
+    "db_database": "ApesParts",
     "db_password": "correcthorsebatterystaple",
     "gmail_password": "correcthorsebatterystaple",
     "members_url": "http://members.team254.dev:8081",
@@ -21,6 +21,7 @@
     "slack_parts_room": "integrations_test"
   },
   "prod": {
+    "db_database": "cheesy_parts",
     "db_password": "Encrypted:QELTie+cal8Q9+NwvD017Q==\n",
     "gmail_password": "Encrypted:0iYLP6HuJ7qY1/BtUYAQ+Q==\n",
     "members_url": "https://members.team254.com",

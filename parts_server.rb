@@ -27,7 +27,7 @@ module CheesyParts
       authenticate! unless ["/login", "/register"].include?(request.path)
       if CheesyCommon::Config.enable_slack_integrations
         Slack.configure do |config|
-  	       config.token = CheesyCommon::Config.slack_api_token
+          config.token = CheesyCommon::Config.slack_api_token
         end
         $slack_client = Slack::Web::Client.new
         $slack_client.auth_test
@@ -113,7 +113,7 @@ module CheesyParts
           client_secrets = Google::APIClient::ClientSecrets.load
           $auth_client = client_secrets.to_authorization
           $auth_client.update!(
-            :scope => ['https://www.googleapis.com/auth/plus.login','https://www.googleapis.com/auth/plus.me','https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/userinfo.profile'],
+            :scope => ['profile', 'openid', 'email'],
             :redirect_uri => CheesyCommon::Config.oauth_callback_url
           )
           auth_uri = $auth_client.authorization_uri.to_s
@@ -347,7 +347,7 @@ module CheesyParts
       halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date
 
       begin
-        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :status => "in_progress", :start_date => params[:start_date]) 
+        task = Task.create(:name => params[:name], :project_id => params[:project_id], :deadline => params[:deadline], :assignee => params[:assignee], :milestone_id => params[:milestone_id], :sub_name => params[:subteam], :notes => params[:notes], :per_comp => 0, :dep_task_id => params[:dep_task_id], :start_date => params[:start_date]) 
         task.save
         rescue Sequel::UniqueConstraintViolation
           halt(400, "Task already exists.")
@@ -388,14 +388,10 @@ module CheesyParts
       halt(400, "Start date must be before deadline.") if params[:start_date].to_date >= params[:deadline].to_date if params[:start_date]
 
       @task.name = params[:name].gsub("\"", "&quot;") if params[:name]
-      if params[:status]
-        halt(400, "Invalid status.") unless Task::STATUS.include?(params[:status])
-        old_task_status = @task.status
-        new_task_status = params[:status]
-        @task.status = params[:status]
-      end
       @task.assignee = params[:assignee] if params[:assignee]
       @task.sub_name = params[:subteam] if params[:subteam]
+      @task.per_comp = params[:per_comp] if params[:per_comp]
+      @task.dep_task_id = params[:dep_task_id] if params[:dep_task_id]
       @task.milestone_id = params[:milestone_id] if params[:milestone_id]
       @task.start_date = params[:start_date] if params[:start_date]
       @task.deadline = params[:deadline] if params[:deadline]
@@ -437,7 +433,7 @@ module CheesyParts
     end
 
     get "/planning/:id" do
-      erb :gannt
+      erb :gantt
     end
 
     # Dashboards

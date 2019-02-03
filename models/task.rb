@@ -15,8 +15,5 @@ class Task < Sequel::Model
                "outreach" => "Outreach",
                "programming" => "Programming",
                "scouting" => "Scouting" }
-
-  STATUS = { "in_progress" => "In progress",
-             "finished" => "Finished" }
 end
 

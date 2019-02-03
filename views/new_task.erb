@@ -52,6 +52,19 @@
       <% end %>
     </select>
 
+    <!-- Dependent Task -->
+    <label>Dependent Task</label>
+    <select name="dep_task_id">
+      <option value="" selected>None</option>
+      <% Task.each do |task|
+        if @project.id == task.project_id %>
+          <option value="<%= task.id %>">
+            <%= task.name %>
+          </option>
+        <% end %>
+      <% end %>
+    </select>
+
     <label>Start Date</label>
     <input type="text" <% unless @user.can_edit? %>disabled <% end %>class="datepicker" data-date-format="yyyy-mm-dd" name="start_date" value="<%= @task.start_date.strftime("%F") rescue "" %>"/>
 
