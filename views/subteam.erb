@@ -28,7 +28,7 @@
         <% if task.sub_name == @subteam.name %>
             <tr>
                 <td><a href="/tasks/<%= task.id %>"><%= task.name %></a></td>
-                <td><a href="/projects/<%= task.project_id %>"><%= Project[task.project_id].name %></a></td>
+                <td><a href="/projects/<%= task.project_id %>"><%= Project[task.project_id].name unless Project[task.project_id].nil? %></a></td>
                 <td>
                   <% if task.milestone.nil? || task.milestone_id == 0 %>
                     None 

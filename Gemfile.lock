@@ -72,8 +72,8 @@ GEM
     pony (1.11)
       mail (>= 2.0)
     public_suffix (3.0.0)
-    rack (1.6.4)
-    rack-protection (1.5.3)
+    rack (1.6.12)
+    rack-protection (1.5.5)
       rack
     rake (10.5.0)
     representable (3.0.4)
@@ -125,6 +125,8 @@ DEPENDENCIES
   mysql2
   pathological
   pony
+  rack
+  rack-protection
   rake
   sequel
   sinatra
@@ -132,4 +134,4 @@ DEPENDENCIES
   thin
 
 BUNDLED WITH
-   1.16.6
+   2.1.4

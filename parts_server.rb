@@ -206,7 +206,7 @@ module CheesyParts
 
     post "/projects/:id/delete" do
       require_permission(@user.can_administer?)
-
+      DB[:tasks].where(project_id: params[:id])
       @project.delete
       redirect "/projects"
     end
