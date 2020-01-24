@@ -17,8 +17,8 @@
     "members_url": "http://members.team254.dev:8081",
     "oauth_callback_url": "http://localhost:9000/login",
     "base_address": "http://localhost:9000",
-    "slack_orders_room": "integrations_test",
-    "slack_parts_room": "integrations_test"
+    "slack_orders_room": "testing",
+    "slack_parts_room": "testing"
   },
   "prod": {
     "db_database": "cheesy_parts",
@@ -29,7 +29,6 @@
     "base_address": "http://parts.apesofwrath668.org",
     "slack_orders_room": "orders",
     "slack_parts_room": "machining",
-    "slack_schedule_room": "schedule",
-    "slack_testing_room": "testing"
+    "slack_schedule_room": "schedule"
   }
 }
